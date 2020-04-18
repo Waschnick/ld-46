@@ -105,7 +105,7 @@ class StatusElement {
     this.scene = scene;
 
     this.progressBox.fillStyle(0x222222, 0.8);
-    this.progressBox.fillRect(70, this.scene.statusBarYOffset + this.yOffset, (window.innerWidth - 80), 20);
+    this.progressBox.fillRect(70, this.scene.statusBarYOffset + this.yOffset, (Globals.gameWidth - 80), 20);
   }
 
   setFill(percent: number) {
@@ -119,7 +119,7 @@ class StatusElement {
       this.progressBar.fillStyle(0xff0000, 0.9);
     }
 
-    this.progressBar.fillRect(70, this.scene.statusBarYOffset + this.yOffset + 2, (window.innerWidth - 80) * (percent / 100) + 1, 16);
+    this.progressBar.fillRect(70, this.scene.statusBarYOffset + this.yOffset + 2, (Globals.gameWidth- 80) * (percent / 100) + 1, 16);
 
   }
 }

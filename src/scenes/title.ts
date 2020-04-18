@@ -34,7 +34,7 @@ export class Title extends Phaser.Scene {
 
     this.time.delayedCall(2000, () => this.sound.play(AudioAssets.DUCKS_QUAK_SOUND))
 
-    let ducksLogoImage = this.add.image((window.innerWidth / 2), 200, ImageAssets.DUCKS_LOGO)
+    let ducksLogoImage = this.add.image((Globals.gameWidth / 2), 200, ImageAssets.DUCKS_LOGO)
 
     this.cameras.main.once('camerafadeincomplete', (camera: any) => {
       this.time.delayedCall(1000, () => {
@@ -55,7 +55,7 @@ export class Title extends Phaser.Scene {
     // Set fullscreen
     let image = this.add.image(0, 0, ImageAssets.TITLE_IMAGE)
       .setOrigin(0, 0)
-      .setDisplaySize(window.innerWidth, window.innerHeight)
+      .setDisplaySize(Globals.gameWidth, Globals.gameHeight)
     this.cameras.main.fadeIn(800);
 
     this.addGameButton()
@@ -89,7 +89,7 @@ export class Title extends Phaser.Scene {
   private centerButton(gameObject: any, offset = 0) {
     Phaser.Display.Align.In.Center(
       gameObject,
-      this.add.zone(window.innerWidth / 2, window.innerHeight / 2 + (offset), window.innerWidth, window.innerHeight)
+      this.add.zone(Globals.gameWidth / 2, Globals.gameHeight / 2 + (offset), window.innerWidth, window.innerHeight)
     );
   }
 

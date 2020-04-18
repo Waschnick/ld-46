@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import Assets from "../assets/assets";
+import Globals from "../globals";
 
 export class Preload extends Phaser.Scene {
   init() {
@@ -32,7 +33,7 @@ export class Preload extends Phaser.Scene {
     var progressBox = this.add.graphics();
     var progressBar = this.add.graphics();
     progressBox.fillStyle(0x222222, 0.8);
-    progressBox.fillRect(10, 270, window.innerWidth - 20, 50);
+    progressBox.fillRect(10, 270, Globals.gameWidth - 20, 50);
     // progressBox.fillRect(240, 270, 320, 50);
 
     var width = this.cameras.main.width;
