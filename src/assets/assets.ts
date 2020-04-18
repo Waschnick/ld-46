@@ -26,6 +26,13 @@ export class Assets {
     }
   }
 
+  titleImage(): PngImage {
+    return {
+      name: "title_image",
+      png: require('./images/TitleScreen.png').default
+    }
+  }
+
 
 }
 

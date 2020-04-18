@@ -15,7 +15,7 @@ defaultConfig = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
-    publicPath: '/',
+    publicPath: '',
     jsonpFunction: 'ld46Jsonp'
   },
 

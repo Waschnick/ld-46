@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "phaser": "^3.8.0",
+    "phaser": "^3.22.0",
     "webpack": "^4.8.3"
   },
   "devDependencies": {

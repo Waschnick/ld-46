@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 import {Preload} from "./scenes/preload";
 import {Boot} from "./scenes/boot";
 import {Game} from "./scenes/game";
+import GameConfig = Phaser.Types.Core.GameConfig;
 
 
 class Main extends Phaser.Game {
