@@ -1,14 +1,18 @@
 import * as Phaser from "phaser";
-import Assets, {TileImageSetKeys, TileJsonMaps} from "../assets/assets";
+import Assets, {ImageAssets, Sprites, TileImageSetKeys, TileJsonMaps} from "../assets/assets";
 import Tilemap = Phaser.Tilemaps.Tilemap;
 import Tileset = Phaser.Tilemaps.Tileset;
 import StaticTilemapLayer = Phaser.Tilemaps.StaticTilemapLayer;
 import Globals from "../globals";
 import Scene = Phaser.Scene;
+import PictureButton from "../assets/objects/PictureButton";
+import SpriteCharacter, {CharacterFacing} from "../assets/objects/SpriteCharacter";
+import CreateSpriteCharacters, {SpriteCharacters} from "../assets/objects/SpriteCharacterGenerator";
 
 export class Game extends Phaser.Scene {
   init() {
     console.log("Initializing game");
+    // Phaser.CANVAS.setSmoothingEnabled(this.game.context, false);
   }
 
   height: number = Globals.gameHeight;
@@ -17,10 +21,14 @@ export class Game extends Phaser.Scene {
   statusBarYOffset: number = this.height - this.statusBarHeight;
 
   create() {
+    // this.cameras.main.setZoom(2)
+    Globals.fadeOutTitleMusic(this)
+
     let map: Tilemap = this.make.tilemap({key: TileJsonMaps.MAP1});
     let tileset: Tileset = map.addTilesetImage(TileImageSetKeys.DESERT);
     let layer: StaticTilemapLayer = map.createStaticLayer(0, tileset, 0, 0);
-
+    layer.setScale(2)
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     let statusBox = this.add.graphics();
     statusBox.fillStyle(0x222222, 1);
@@ -48,8 +56,27 @@ export class Game extends Phaser.Scene {
     let funStatus = new StatusElement(this, 100)
     funStatus.setFill(100)
 
+    let menuButton1 = new PictureButton(this, 10, this.height - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'Shop', () => this.switchToShop());
+
+    let menuButton2 = new PictureButton(this, this.width - 10 - 140, this.height - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'City', () => this.switchToCity());
+
+
+    let frameView = this.add.graphics({fillStyle: {color: 0xff00ff}, x: 0, y: 0}).setScale(3).setAlpha(0.7);
+    let girl1: SpriteCharacter = CreateSpriteCharacters.createSpriteCharacter(SpriteCharacters.IngaChild, this)
+    // girl1.setPosition(0, 90)
+
+    frameView.fillRect(girl1.sprite.frame.cutX, girl1.sprite.frame.cutY, 32, 32);
   }
 
+  private switchToShop() {
+    this.cameras.main.fadeOut(300);
+    this.time.delayedCall(500, () => this.scene.switch('shop'))
+  }
+
+  private switchToCity() {
+    this.cameras.main.fadeOut(300);
+    this.time.delayedCall(500, () => this.scene.switch('city'))
+  }
 
   private createStatusBar(text: string, offset: number) {
     return this.make.text({

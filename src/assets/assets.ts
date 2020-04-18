@@ -3,27 +3,34 @@ import Scene = Phaser.Scene;
 const pngAssets: { [key: string]: string; } = {
   [ImageAssets.DUCKS_LOGO]: require('./images/DucksScreen.png').default,
   [ImageAssets.TITLE_IMAGE]: require('./images/TitleScreen.png').default,
-  [ImageAssets.BLUE_BUTTON_02]: require('./images/ui/blue_button02.png').default,
-  [ImageAssets.BLUE_BUTTON_03]: require('./images/ui/blue_button03.png').default
+  [ImageAssets.BLUE_BUTTON_1]: require('./images/ui/blue_button_1.png').default,
+  [ImageAssets.BLUE_BUTTON_2]: require('./images/ui/blue_button_2.png').default,
+  [ImageAssets.STATS_BUTTON_1]: require('./images/ui/stats_button_1.png').default,
+  [ImageAssets.STATS_BUTTON_2]: require('./images/ui/stats_button_2.png').default,
 }
 
 export const enum ImageAssets {
   DUCKS_LOGO = "ducks_logo",
   TITLE_IMAGE = "title_image",
-  BLUE_BUTTON_02 = "blue_button_02",
-  BLUE_BUTTON_03 = "BLUE_BUTTON_03",
+  BLUE_BUTTON_1 = "BLUE_BUTTON_1",
+  BLUE_BUTTON_2 = "BLUE_BUTTON_2",
+  STATS_BUTTON_1 = "STATS_BUTTON_1",
+  STATS_BUTTON_2 = "STATS_BUTTON_2",
 }
 
 // AUDIO
 
 const audioOggAssets: { [key: string]: string; } = {
   [AudioAssets.DUCKS_QUAK_SOUND]: require('./audio/duck.ogg').default,
-  [AudioAssets.TITLE_SONG]: require('./audio/title_song.mp3').default
+  [AudioAssets.TITLE_SONG]: require('./audio/title_song.mp3').default,
+  [AudioAssets.BLIP_01]: require('./audio/blip.wav').default,
+
 }
 
 export const enum AudioAssets {
   DUCKS_QUAK_SOUND = "ducks_quak_sound",
-  TITLE_SONG = "title_song.mp3",
+  TITLE_SONG = "title_song",
+  BLIP_01 = "blip-01",
 }
 
 // SPRITES
@@ -32,6 +39,18 @@ export const enum AudioAssets {
 // game.load.spritesheet('mario', 'assets/misc/mariospritesheet-small.png',50,50); // key, sourcefile, framesize x, framesize y
 
 // Tiles
+
+export const enum Sprites {
+  DWARF = "Dwarf",
+  INGA = "Inga1",
+  INGA_CHILD = "inga_child"
+}
+
+const spritSheetsAssets: { [key: string]: string; } = {
+  [Sprites.DWARF]: require('./sprites/Dwarf_Sprite_Sheet.png').default,
+  [Sprites.INGA_CHILD]: require('./sprites/inga-sprite-sheet-child.png').default,
+  [Sprites.INGA]: require('./sprites/inga-sprite-sheet.png').default,
+}
 
 // HINT: This is part of the JSON file and needs to be the same key!!!
 export const enum TileImageSetKeys {
@@ -67,6 +86,15 @@ function loadAssets(scene: Scene) {
   loadAudio(scene)
   loadImages(scene)
   loadTiles(scene)
+
+
+  //  37x45 is the size of each frame
+  //  There are 18 frames in the PNG - you can leave this value blank if the frames fill up the entire PNG, but in this case there are some
+  //  blank frames at the end, so we tell the loader how many to load
+  //                     key, sourcefile,             framesize x, framesize y
+  scene.load.spritesheet(Sprites.DWARF, spritSheetsAssets[Sprites.DWARF], {frameWidth: 38, frameHeight: 32});
+  scene.load.spritesheet(Sprites.INGA, spritSheetsAssets[Sprites.INGA], {frameWidth: 32, frameHeight: 32});
+  scene.load.spritesheet(Sprites.INGA_CHILD, spritSheetsAssets[Sprites.INGA_CHILD], {frameWidth: 32, frameHeight: 32});
 }
 
 function loadAudio(scene: Scene) {
@@ -84,10 +112,7 @@ function loadImages(scene: Scene) {
 }
 
 const Assets = {
-  pngAssets,
-  audioOggAssets,
   loadAssets,
-  loadTiles
 }
 
 export default Assets;

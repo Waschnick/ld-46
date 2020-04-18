@@ -32,7 +32,7 @@ defaultConfig = {
       // {test: [/\.vert$/, /\.frag$/], use: 'raw-loader'}, // shaders
       // {test: /assets([\/\\])/, type: 'javascript/auto', loader: 'file-loader?name=[hash].[ext]'},
       {
-        test: /\.(png|jpe?g|gif|svg|ico|ogg|mp3)$/,
+        test: /\.(png|jpe?g|gif|svg|ico|ogg|mp3|wav)$/,
         loader: 'file-loader',
         options: {
           name: '[path][name].[ext]?[hash]',
@@ -57,6 +57,7 @@ defaultConfig = {
     new webpack.DefinePlugin({
       BUNDLE_VERSION: JSON.stringify(BUNDLE_VERSION),
       IS_PROD: JSON.stringify(IS_PRODUCTION),
+      NODE_ENV: JSON.stringify(process.env.NODE_ENV),
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true)
     }),

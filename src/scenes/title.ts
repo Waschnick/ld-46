@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 import BaseSound = Phaser.Sound.BaseSound;
 import {AudioAssets, ImageAssets} from "../assets/assets";
+import Globals from "../globals";
 
 export class Title extends Phaser.Scene {
 
@@ -20,13 +21,10 @@ export class Title extends Phaser.Scene {
 
 
     if (IS_PROD) {
-      this.sound.volume = 0.0
-      let music: BaseSound = this.sound.add(AudioAssets.TITLE_SONG,)
-      music.play(AudioAssets.TITLE_SONG, {volume: 0.8, loop: true})
-
-      this.tweens.add({targets: this.sound, volume: 1.0, duration: 4000, delay: 200});
-
+      Globals.playTitleMusic(this)
       this.showDucksLogo()
+    } else if (NODE_ENV === "demo-game") {
+      this.scene.start('demo-game')
     } else {
       this.scene.start('game')
     }
@@ -64,7 +62,7 @@ export class Title extends Phaser.Scene {
   }
 
   private addGameButton(): void {
-    let gameButton = this.add.sprite(100, 200, ImageAssets.BLUE_BUTTON_02).setInteractive();
+    let gameButton = this.add.sprite(100, 200, ImageAssets.BLUE_BUTTON_1).setInteractive();
     this.centerButton(gameButton, 100);
 
     let gameText = this.add.text(0, 0, 'Play', {fontSize: '32px', fill: '#fff'});
@@ -75,18 +73,16 @@ export class Title extends Phaser.Scene {
         this.cameras.main.fadeOut(500);
         this.time.delayedCall(700, () => this.scene.start('game'))
       })
-
-
     })
 
     this.input.on('pointerover', (event: any, gameObjects: any) => {
-      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_03);
+      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_2);
     });
     this.input.on('touchstart', (event: any, gameObjects: any) => {
-      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_03);
+      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_2);
     });
     this.input.on('pointerout', function (event: any, gameObjects: any) {
-      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_02);
+      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_1);
     });
   }
 

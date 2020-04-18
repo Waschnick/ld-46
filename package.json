@@ -10,6 +10,7 @@
     "build:watch": "webpack --watch",
     "serve": "http-server",
     "watch": "webpack-dev-server --config webpack.config.js --hot --inline --progress",
+    "watch:demo": "cross-env NODE_ENV=demo-game webpack-dev-server --config webpack.config.js --hot --inline --progress",
     "watch:prod": "cross-env SNAPSHOT=${SNAPSHOT} NODE_ENV=production webpack-dev-server --config webpack.config.js --hot --inline --progress"
   },
   "author": "",
