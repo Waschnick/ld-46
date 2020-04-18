@@ -1,2 +1,9 @@
+# OS
+
+# Project
 node_modules
 dist
+
+# IntelliJ
+.idea
+*.iml
