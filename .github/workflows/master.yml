@@ -1,0 +1,61 @@
+name: master
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  APP_NAME: ld-46
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  build:
+    name: build image
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+
+      # npm ci installs the versions in the package-lock.json file and prevents updates to the lock file.
+      # Using npm ci is generally faster than running npm install.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: export SNAPSHOT="-${GITHUB_RUN_NUMBER}";npm run build
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: widget-dist-artifact
+          path: dist
+
+  deploy:
+    name: deploy artifact
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: widget-dist-artifact
+          path: dist
+
+      - name: Deploy to S3
+        run: aws s3 cp --recursive dist/ s3://static.waschnick.com/ld46/ --cache-control "max-age=600"
+

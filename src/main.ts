@@ -1,15 +1,15 @@
 import * as Phaser from "phaser";
-import { Preload } from "./scenes/preload";
-import { Boot } from "./scenes/boot";
-import { Game } from "./scenes/game";
+import {Preload} from "./scenes/preload";
+import {Boot} from "./scenes/boot";
+import {Game} from "./scenes/game";
 
 
 class Main extends Phaser.Game {
   constructor() {
     const config: GameConfig = {
       type: Phaser.AUTO,
-      width: 800,
-      height: 600,
+      width: window.innerWidth,
+      height: window.innerHeight
     };
     super(config);
 
