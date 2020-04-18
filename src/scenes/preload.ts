@@ -14,18 +14,24 @@ export class Preload extends Phaser.Scene {
     // this.load.setPath('assets/');
     // this.load.setBaseURL('http://labs.phaser.io');
 
+    // SIZE = 336x240
     console.info("Image:", Assets.ducksLogo().png)
     this.load.image(Assets.ducksLogo().name, Assets.ducksLogo().png);
-    this.add.image(100, 100, Assets.ducksLogo().name);
+    // this.add.image(100, 100, Assets.ducksLogo().name);
 
     // Load all images
 
     // Load all sounds
     // this.game.sound.
 
+    //width: window.innerWidth,
+    //   height: window.innerHeight
+
     this.load.on("complete", () => {
       // this.scene.start("Scene_Menu");
       console.info("LOAD COMPLETE, START GAME!");
+      this.add.image((window.innerWidth / 2), 200, Assets.ducksLogo().name);
+
       // this.scene.start("game");
     });
 
