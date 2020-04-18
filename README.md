@@ -1,17 +1,11 @@
-# Phaser 3 typescript template
-Minimalistic setup.
+# tbd
 
-## Prereqs
+## Nice resources
 
-Install [node.js](https://nodejs.org/en/)
-
-## Setting up
-Clone the repository and add your own repository as origin
-```git
-git clone https://github.com/maakep/phaser3-typescript-template your-game
-git remote set-url origin https://github.com/your-user/your-game.git
-```
-
+https://github.com/maakep/phaser3-typescript-template (that's the foundation of this project)
+https://github.com/troyedwardsjr/phaser3-typescript-webpack/blob/master/tsconfig.json
+https://github.com/rroylance/phaser-ce-npm-webpack-typescript-starter-project/blob/7fde95c77b/src/app.ts
+https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/?a=13
 
 ## Installing
 ```sh

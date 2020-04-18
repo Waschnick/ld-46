@@ -6,6 +6,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WebpackBar = require('webpackbar');
 
+const BUNDLE_VERSION = process.env.npm_package_version + (process.env.SNAPSHOT || ('-SNAPSHOT@' + new Date().toISOString()));
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 defaultConfig = {
   entry: {
     app: ['./src/main.ts']
@@ -29,11 +32,11 @@ defaultConfig = {
       {test: [/\.vert$/, /\.frag$/], use: 'raw-loader'},
       // {test: /assets([\/\\])/, type: 'javascript/auto', loader: 'file-loader?name=[hash].[ext]'},
       {
-        test: /\.(png|jpe?g|gif|svg|ico)$/, loader: 'file-loader',
+        test: /\.(png|jpe?g|gif|svg|ico|ogg|mp3)$/, loader: 'file-loader',
 
         options: {
-          // name: '[path][name].[ext]?[hash]',
-          name: '[path][name].[ext]',
+          name: '[path][name].[ext]?[hash]',
+          // name: '[path][name].[ext]',
           context: 'src/assets',
         }
       }
@@ -43,10 +46,14 @@ defaultConfig = {
   plugins: [
     new WebpackBar(),
     new webpack.DefinePlugin({
+      BUNDLE_VERSION: JSON.stringify(BUNDLE_VERSION),
+      IS_PROD: JSON.stringify(IS_PRODUCTION),
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true)
     }),
-    new webpack.NamedModulesPlugin(),
+    new CopyWebpackPlugin([
+      {from: 'src/assets/public', to: ''}
+    ]),
     new HtmlWebpackPlugin({
       // filename: './index.html',
       template: './src/index.html',
