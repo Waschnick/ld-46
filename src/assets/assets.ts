@@ -1,28 +1,13 @@
-// export namespace Images {
-//
-//   export class ImagesBackgroundTemplate {
-//
-//     static getName(): string {
-//       return 'background_template';
-//     }
-//
-//     static getPNG(): string {
-//       return require('src/assets/images/DucksScreen.png');
-//     }
-//   }
-// }
-
 import Scene = Phaser.Scene;
-import LoaderPlugin = Phaser.Loader.LoaderPlugin;
 
-export const pngAssets: { [key: string]: string; } = {
-  [PngImages.DUCKS_LOGO]: require('./images/DucksScreen.png').default,
-  [PngImages.TITLE_IMAGE]: require('./images/TitleScreen.png').default,
-  [PngImages.BLUE_BUTTON_02]: require('./images/ui/blue_button02.png').default,
-  [PngImages.BLUE_BUTTON_03]: require('./images/ui/blue_button03.png').default
+const pngAssets: { [key: string]: string; } = {
+  [ImageAssets.DUCKS_LOGO]: require('./images/DucksScreen.png').default,
+  [ImageAssets.TITLE_IMAGE]: require('./images/TitleScreen.png').default,
+  [ImageAssets.BLUE_BUTTON_02]: require('./images/ui/blue_button02.png').default,
+  [ImageAssets.BLUE_BUTTON_03]: require('./images/ui/blue_button03.png').default
 }
 
-export const enum PngImages {
+export const enum ImageAssets {
   DUCKS_LOGO = "ducks_logo",
   TITLE_IMAGE = "title_image",
   BLUE_BUTTON_02 = "blue_button_02",
@@ -31,7 +16,7 @@ export const enum PngImages {
 
 // AUDIO
 
-export const audioOggAssets: { [key: string]: string; } = {
+const audioOggAssets: { [key: string]: string; } = {
   [AudioAssets.DUCKS_QUAK_SOUND]: require('./audio/duck.ogg').default,
   [AudioAssets.TITLE_SONG]: require('./audio/title_song.mp3').default
 }
@@ -41,16 +26,52 @@ export const enum AudioAssets {
   TITLE_SONG = "title_song.mp3",
 }
 
-export function loadAssets(scene: Scene) {
-  loadAudio(scene)
-  loadImages(scene)
+// SPRITES
+
+// key, sourcefile, framesize x, framesize y
+// game.load.spritesheet('mario', 'assets/misc/mariospritesheet-small.png',50,50); // key, sourcefile, framesize x, framesize y
+
+// Tiles
+
+// HINT: This is part of the JSON file and needs to be the same key!!!
+export const enum TileImageSetKeys {
+  DESERT = "Desert"
 }
 
-export const sounds: { [key: string]: LoaderPlugin; } = {}
+const tileImageSetAssets: { [key: string]: string; } = {
+  [TileImageSetKeys.DESERT]: require('./tilemaps/tmw_desert_spacing.png').default,
+}
+
+export const enum TileJsonMaps {
+  MAP1 = "DesertMap1"
+}
+
+const tileJsonMapAssets: { [key: string]: string; } = {
+  [TileJsonMaps.MAP1]: require('./tilemaps/desert.json').default,
+}
+
+function loadTiles(scene: Scene) {
+  console.info("Loading tiles.")
+
+  Object.keys(tileJsonMapAssets).forEach(key => {
+    scene.load.tilemapTiledJSON(key, tileJsonMapAssets[key]);
+  })
+  Object.keys(tileImageSetAssets).forEach(key => {
+    scene.load.image(key, tileImageSetAssets[key]);
+  })
+
+  console.info("Finished loading tiles.")
+}
+
+function loadAssets(scene: Scene) {
+  loadAudio(scene)
+  loadImages(scene)
+  loadTiles(scene)
+}
 
 function loadAudio(scene: Scene) {
   Object.keys(audioOggAssets).forEach(key => {
-    sounds[key] = scene.load.audio(key, [audioOggAssets[key]]);
+    scene.load.audio(key, [audioOggAssets[key]]);
   })
 }
 
@@ -61,3 +82,12 @@ function loadImages(scene: Scene) {
   })
 
 }
+
+const Assets = {
+  pngAssets,
+  audioOggAssets,
+  loadAssets,
+  loadTiles
+}
+
+export default Assets;

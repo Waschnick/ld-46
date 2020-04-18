@@ -4,6 +4,7 @@ import {Title} from "./scenes/title";
 import {Boot} from "./scenes/boot";
 import {Game} from "./scenes/game";
 import GameConfig = Phaser.Types.Core.GameConfig;
+import Globals from "./globals";
 
 declare global {
   const BUNDLE_VERSION: string;
@@ -15,8 +16,9 @@ class Main extends Phaser.Game {
   constructor() {
     const config: GameConfig = {
       type: Phaser.AUTO,
-      width: window.innerWidth,
-      height: window.innerHeight
+      width: Globals.gameWidth,
+      height: Globals.gameHeight,
+      parent: "root"
     };
     super(config);
 

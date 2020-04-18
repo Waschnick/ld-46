@@ -29,17 +29,26 @@ defaultConfig = {
   module: {
     rules: [
       {test: /\.(tsx?)|(js)$/, exclude: /node_modules/, loader: 'ts-loader'},
-      {test: [/\.vert$/, /\.frag$/], use: 'raw-loader'},
+      // {test: [/\.vert$/, /\.frag$/], use: 'raw-loader'}, // shaders
       // {test: /assets([\/\\])/, type: 'javascript/auto', loader: 'file-loader?name=[hash].[ext]'},
       {
-        test: /\.(png|jpe?g|gif|svg|ico|ogg|mp3)$/, loader: 'file-loader',
-
+        test: /\.(png|jpe?g|gif|svg|ico|ogg|mp3)$/,
+        loader: 'file-loader',
         options: {
           name: '[path][name].[ext]?[hash]',
           // name: '[path][name].[ext]',
           context: 'src/assets',
         }
-      }
+      },
+      {
+        test: /\.json$/,
+        loader: 'file-loader',
+        type: 'javascript/auto',
+        options: {
+          name: '[path][name].[ext]?[hash]',
+          context: 'src/assets',
+        }
+      },
     ]
   },
 

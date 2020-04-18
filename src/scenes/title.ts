@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
-import {AudioAssets, pngAssets, PngImages, sounds} from "../assets/assets";
+import BaseSound = Phaser.Sound.BaseSound;
+import {AudioAssets, ImageAssets} from "../assets/assets";
 
 export class Title extends Phaser.Scene {
 
@@ -20,12 +21,14 @@ export class Title extends Phaser.Scene {
 
     if (IS_PROD) {
       this.sound.volume = 0.0
-      this.sound.play(AudioAssets.TITLE_SONG)
+      let music: BaseSound = this.sound.add(AudioAssets.TITLE_SONG,)
+      music.play(AudioAssets.TITLE_SONG, {volume: 0.8, loop: true})
+
       this.tweens.add({targets: this.sound, volume: 1.0, duration: 4000, delay: 200});
 
       this.showDucksLogo()
     } else {
-      this.showGameTitle()
+      this.scene.start('game')
     }
   }
 
@@ -33,7 +36,7 @@ export class Title extends Phaser.Scene {
 
     this.time.delayedCall(2000, () => this.sound.play(AudioAssets.DUCKS_QUAK_SOUND))
 
-    let ducksLogoImage = this.add.image((window.innerWidth / 2), 200, PngImages.DUCKS_LOGO)
+    let ducksLogoImage = this.add.image((window.innerWidth / 2), 200, ImageAssets.DUCKS_LOGO)
 
     this.cameras.main.once('camerafadeincomplete', (camera: any) => {
       this.time.delayedCall(1000, () => {
@@ -52,7 +55,7 @@ export class Title extends Phaser.Scene {
     console.info("Show game title")
 
     // Set fullscreen
-    let image = this.add.image(0, 0, PngImages.TITLE_IMAGE)
+    let image = this.add.image(0, 0, ImageAssets.TITLE_IMAGE)
       .setOrigin(0, 0)
       .setDisplaySize(window.innerWidth, window.innerHeight)
     this.cameras.main.fadeIn(800);
@@ -61,8 +64,8 @@ export class Title extends Phaser.Scene {
   }
 
   private addGameButton(): void {
-    let gameButton = this.add.sprite(100, 200, PngImages.BLUE_BUTTON_02).setInteractive();
-    this.centerButton(gameButton, 1);
+    let gameButton = this.add.sprite(100, 200, ImageAssets.BLUE_BUTTON_02).setInteractive();
+    this.centerButton(gameButton, 100);
 
     let gameText = this.add.text(0, 0, 'Play', {fontSize: '32px', fill: '#fff'});
     this.centerButtonText(gameText, gameButton);
@@ -77,20 +80,20 @@ export class Title extends Phaser.Scene {
     })
 
     this.input.on('pointerover', (event: any, gameObjects: any) => {
-      gameObjects[0].setTexture(PngImages.BLUE_BUTTON_03);
+      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_03);
     });
     this.input.on('touchstart', (event: any, gameObjects: any) => {
-      gameObjects[0].setTexture(PngImages.BLUE_BUTTON_03);
+      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_03);
     });
     this.input.on('pointerout', function (event: any, gameObjects: any) {
-      gameObjects[0].setTexture(PngImages.BLUE_BUTTON_02);
+      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_02);
     });
   }
 
   private centerButton(gameObject: any, offset = 0) {
     Phaser.Display.Align.In.Center(
       gameObject,
-      this.add.zone(window.innerWidth / 2, window.innerHeight / 2 - offset * 100, window.innerWidth, window.innerHeight)
+      this.add.zone(window.innerWidth / 2, window.innerHeight / 2 + (offset), window.innerWidth, window.innerHeight)
     );
   }
 

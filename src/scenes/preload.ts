@@ -1,16 +1,13 @@
 import * as Phaser from "phaser";
-import {AudioAssets, loadAssets, pngAssets} from "../assets/assets";
+import Assets from "../assets/assets";
 
 export class Preload extends Phaser.Scene {
   init() {
     console.log("Preloading");
-
   }
 
   preload() {
-    console.log("Load things necessary for Game scene");
-    console.info("Main cam", this.cameras.main.width, this.cameras.main.height)
-    console.info("Default cam", this.cameras.default.width, this.cameras.default.height)
+    console.log("Load things necessary for Game scene, cam:", this.cameras.main.width, this.cameras.main.height);
 
     // FIXME for release
     // this.load.setPath('assets/');
@@ -75,7 +72,6 @@ export class Preload extends Phaser.Scene {
     assetText.setOrigin(0.5, 0.5);
 
     this.load.on('progress', (value: number) => {
-      console.log(value);
       progressBar.clear();
       // progressBar.fillRect(250, 280, 300 * value, 30);
       progressBar.fillStyle(0xffffff, 0.5);
@@ -119,7 +115,7 @@ export class Preload extends Phaser.Scene {
       this.scene.start('title');
     }
 
-    loadAssets(this)
+    Assets.loadAssets(this)
   }
 
 
