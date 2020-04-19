@@ -4,8 +4,9 @@
   "description": "",
   "main": "./dist/main.js",
   "scripts": {
-    "build": "npm run build:clean && npm run build:prod",
+    "build": "npm run build:clean && npm run build:extrude && npm run build:prod",
     "build:clean": "rimraf dist/* && mkdirp dist",
+    "build:extrude": "tile-extruder --tileWidth 32 --tileHeight 32 --input ./src/assets/tilemaps/city.png --output ./src/assets/tilemaps/city-extruded.png",
     "build:prod": "cross-env SNAPSHOT=${SNAPSHOT} NODE_ENV=production webpack --config webpack.config.js",
     "build:watch": "webpack --watch",
     "serve": "http-server",
@@ -26,6 +27,7 @@
     "html-webpack-plugin": "^4.2.0",
     "http-server": "^0.11.1",
     "rimraf": "^3.0.2",
+    "tile-extruder": "^2.0.5",
     "ts-loader": "^4.3.0",
     "typescript": "^2.8.3",
     "webpack-cli": "^2.1.5",

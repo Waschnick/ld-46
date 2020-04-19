@@ -3,7 +3,9 @@
 # Project
 node_modules
 dist
+city-extruded.png
 
 # IntelliJ
 .idea
 *.iml
+

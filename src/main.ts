@@ -26,8 +26,14 @@ class Main extends Phaser.Game {
       height: Globals.gameHeight,
       parent: "root",
       render: {
-        pixelArt: true
+        pixelArt: true,
+        // roundPixels: true
       },
+
+      // fps: {
+      //   target: 15,
+      //   smoothStep: true
+      // },
       physics: {
         default: 'matter',
         matter: {
@@ -42,6 +48,8 @@ class Main extends Phaser.Game {
 
     Globals.timeIncreaseEventEmitter = new EventEmitter();
 
+
+    // Phaser.ScaleModes.DEFAULT = 1
 
     if (IS_PROD) {
       // this.phy

@@ -51,10 +51,9 @@ export default class PictureButton extends Phaser.GameObjects.Container {
       this.isPressed = true;
     });
 
-    this.button.on('pointerout', () => {
-      console.info("Pointer out")
-    });
-
+    // this.button.on('pointerout', () => {
+    //   console.info("Pointer out")
+    // });
 
     //  A sprite, doesn't scroll with the camera (is fixed to camera)
     this.setScrollFactor(0)
@@ -64,11 +63,11 @@ export default class PictureButton extends Phaser.GameObjects.Container {
   }
 
   buttonClick() {
-    console.info("Button click")
+    this.isPressed = false;
+
     // FIXME Globals.playClick(this.scene)
     this.scene.time.delayedCall(100, () => {
       this.button.setTexture(this.key1)
-      this.isPressed = false;
       if (this.callback) {
         this.callback();
       }

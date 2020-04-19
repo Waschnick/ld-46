@@ -67,11 +67,13 @@ const spritSheetsAssets: { [key: string]: string; } = {
 export const enum TileImageSetKeys {
   DESERT = "Desert",
   CITY = "City",
+  CITY_EXTRUDED = "CITY_EXTRUDED",
 }
 
 const tileImageSetAssets: { [key: string]: string; } = {
   [TileImageSetKeys.DESERT]: require('./tilemaps/tmw_desert_spacing.png').default,
   [TileImageSetKeys.CITY]: require('./tilemaps/city.png').default,
+  [TileImageSetKeys.CITY_EXTRUDED]: require('./tilemaps/city-extruded.png').default,
 }
 
 export const enum TileJsonMaps {

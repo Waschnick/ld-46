@@ -9,6 +9,7 @@ import Tileset = Phaser.Tilemaps.Tileset;
 import StaticTilemapLayer = Phaser.Tilemaps.StaticTilemapLayer;
 import Graphics = Phaser.GameObjects.Graphics;
 import GameObject = Phaser.GameObjects.GameObject;
+import ScaleModes = Phaser.Scale.ScaleModes;
 
 export class City extends Phaser.Scene {
 
@@ -27,11 +28,15 @@ export class City extends Phaser.Scene {
   /**
    * Collision: https://phaser.io/examples/v3/view/game-objects/tilemap/static/set-colliding-by-collision-data
    */
-
   create() {
+    // Phaser.ScaleModes.DEFAULT
+
+    this.game.scale.scaleMode = ScaleModes.RESIZE
 
     this.map = this.make.tilemap({key: TileJsonMaps.CITY});
-    let tileset: Tileset = this.map.addTilesetImage(TileImageSetKeys.CITY);
+
+    // HINT: use an extruded TileMap --> https://github.com/sporadic-labs/tile-extruder (Helps against pixel bleeding)
+    let tileset: Tileset = IS_PROD ? this.map.addTilesetImage(TileImageSetKeys.CITY, TileImageSetKeys.CITY_EXTRUDED, 32, 32, 1, 2) : this.map.addTilesetImage(TileImageSetKeys.CITY);
     this.mapLayer2 = this.map.createStaticLayer(1, tileset, 0, 0).setScale(2);
     this.mapLayer1 = this.map.createStaticLayer(0, tileset, 0, 0).setScale(2);
 
@@ -50,8 +55,8 @@ export class City extends Phaser.Scene {
     // Get the layers registered with Matter. Any colliding tiles will be given a Matter body. We
     // haven't mapped our collision shapes in Tiled so each colliding tile will get a default
     // rectangle body (similar to AP).
-    // this.matter.world.convertTilemapLayer(this.mapLayer1);
-    // this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
+    this.matter.world.convertTilemapLayer(this.mapLayer1);
+    this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
 
     this.matter.world.on('collisionstart', (event: any, bodyA: any, bodyB: any) => {
       console.log('collision', event, bodyA, bodyB);
@@ -75,25 +80,29 @@ export class City extends Phaser.Scene {
 
     // this.matter.enableCollisionEventsPlugin()
 
-    // if (!IS_PROD) {
-    //   let shapeGraphics = this.add.graphics();
-    //   this.drawCollisionShapes(shapeGraphics);
-    //
-    //   var debugGraphics = this.add.graphics();
-    //   debugGraphics.setScale(2);
-    //   this.mapLayer1.renderDebug(debugGraphics, {
-    //     tileColor: null, //new Phaser.Display.Color(105, 210, 231, 200), // Non colliding tiles
-    //     collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200), // Colliding tiles
-    //     faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Interesting faces, i.e. colliding edges
-    //   });
-    // }
+    if (!IS_PROD) {
+      let shapeGraphics = this.add.graphics();
+      this.drawCollisionShapes(shapeGraphics);
+
+
+      var debugGraphics = this.add.graphics();
+      debugGraphics.setScale(2);
+      this.mapLayer1.renderDebug(debugGraphics, {
+        tileColor: null, //new Phaser.Display.Color(105, 210, 231, 200), // Non colliding tiles
+        collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200), // Colliding tiles
+        faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Interesting faces, i.e. colliding edges
+      });
+    }
 
     this.addUiControls()
+
+
   }
 
   addUiControls() {
     this.buttonUp = new PictureButton(this, Globals.gameWidth - 120, Globals.gameHeight - 240, ImageAssets.GREY_BUTTON_1, ImageAssets.GREY_BUTTON_2,
       () => {
+        console.info("UP")
       })
     this.buttonDown = new PictureButton(this, Globals.gameWidth - 120, Globals.gameHeight - 120, ImageAssets.GREY_BUTTON_1, ImageAssets.GREY_BUTTON_2,
       () => {
@@ -124,10 +133,11 @@ export class City extends Phaser.Scene {
     // }
     // this.player.update(arguments)
 
+
     // this.player.angle += 1;
     let factor = 1;
-    let xMovement = this.cursors.left.isDown || this.cursors.right.isDown
-    let yMovement = this.cursors.down.isDown || this.cursors.up.isDown
+    let xMovement = this.cursors.left.isDown || this.cursors.right.isDown || this.buttonLeft.isPressed || this.buttonRight.isPressed
+    let yMovement = this.cursors.down.isDown || this.cursors.up.isDown || this.buttonDown.isPressed || this.buttonUp.isPressed
 
     if (xMovement && yMovement) {
       factor = 0.7

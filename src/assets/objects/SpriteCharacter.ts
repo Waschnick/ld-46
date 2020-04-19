@@ -92,7 +92,7 @@ export default class SpriteCharacter extends Phaser.Physics.Matter.Sprite {
 
   alignToFacing() {
     this.isMoving = false
-    this.scene.time.delayedCall(250, () => {
+    this.scene.time.delayedCall(100, () => {
       this.anims.stop()
       this.face(this.facing)
     })
@@ -100,36 +100,37 @@ export default class SpriteCharacter extends Phaser.Physics.Matter.Sprite {
   }
 
   moveX(value: number) {
-    this.isMoving = true
     if (value > 0) {
-      if (this.anims.getCurrentKey() != CharacterFacing.FACING_RIGHT) {
-        this.anims.play(CharacterFacing.FACING_RIGHT);
-        // this.anims.setYoyo(true)
-        // this.anims.setRepeat(-1)
-        this.facing = CharacterFacing.FACING_RIGHT;
-      }
+      this.facing = CharacterFacing.FACING_RIGHT;
     } else {
-      if (this.anims.getCurrentKey() != CharacterFacing.FACING_LEFT) {
-        this.anims.play(CharacterFacing.FACING_LEFT);
-        // this.anims.setYoyo(true)
-        // this.anims.setRepeat(-1)
-        this.facing = CharacterFacing.FACING_LEFT;
-      }
+      this.facing = CharacterFacing.FACING_LEFT;
     }
     this.x += value
+
+    this.moveInFacing()
+  }
+
+  private moveInFacing() {
+    console.info("Ismoving", this.isMoving, this.anims.getCurrentKey(), this.facing)
+
+    let isNotCurrentAnimation = this.anims.getCurrentKey() !== this.facing
+
+    if (isNotCurrentAnimation || !this.isMoving || !this.anims.isPlaying) {
+      this.anims.play(this.facing);
+      this.isMoving = true
+    }
   }
 
 
   moveY(value: number) {
-    this.isMoving = true
-
     if (value > 0) {
-      this.walk(CharacterFacing.FACING_DOWN)
+      this.facing = CharacterFacing.FACING_DOWN;
     } else {
-      this.walk(CharacterFacing.FACING_UP)
-
+      this.facing = CharacterFacing.FACING_UP;
     }
     this.y += value
+
+    this.moveInFacing()
   }
 
   // setPosition(x: number, y: number): this {
