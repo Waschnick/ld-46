@@ -1,37 +1,24 @@
 import * as Phaser from "phaser";
-import Assets, {ImageAssets, Sprites, TileImageSetKeys, TileJsonMaps} from "../assets/assets";
-import Tilemap = Phaser.Tilemaps.Tilemap;
-import Tileset = Phaser.Tilemaps.Tileset;
-import StaticTilemapLayer = Phaser.Tilemaps.StaticTilemapLayer;
+import {ImageAssets} from "../assets/assets";
 import Globals from "../globals";
-import Scene = Phaser.Scene;
 import PictureButton from "../assets/objects/PictureButton";
-import SpriteCharacter, {CharacterFacing} from "../assets/objects/SpriteCharacter";
-import CreateSpriteCharacters, {SpriteCharacters} from "../assets/objects/SpriteCharacterGenerator";
+import {GameScene, GameStatus} from "../GameStatus";
 
 export class Shop extends Phaser.Scene {
-  init() {
-    console.log("Initializing Shop");
-    // Phaser.CANVAS.setSmoothingEnabled(this.game.context, false);
-  }
 
+  private gameStatus: GameStatus = new GameStatus(this)
+
+  init() {
+    this.gameStatus = new GameStatus(this)
+  }
 
   create() {
 
-    let menuButton1 = new PictureButton(this, 10, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'Home', () => this.switchToHome());
+    let menuButton1 = new PictureButton(this, 10, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'Home', () => this.gameStatus.switchScene(GameScene.HOME));
 
-    let menuButton2 = new PictureButton(this, Globals.gameWidth - 10 - 140, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'City', () => this.switchToCity());
+    let menuButton2 = new PictureButton(this, Globals.gameWidth - 10 - 140, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'City', () => this.gameStatus.switchScene(GameScene.CITY));
 
   }
 
-  private switchToHome() {
-    this.cameras.main.fadeOut(300);
-    this.time.delayedCall(500, () => this.scene.switch('game'))
-  }
-
-  private switchToCity() {
-    this.cameras.main.fadeOut(300);
-    this.time.delayedCall(500, () => this.scene.switch('city'))
-  }
 
 }

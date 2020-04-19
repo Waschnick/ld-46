@@ -1,33 +1,21 @@
 import * as Phaser from "phaser";
-import BaseSound = Phaser.Sound.BaseSound;
 import {AudioAssets, ImageAssets} from "../assets/assets";
 import Globals from "../globals";
+import GameObject = Phaser.GameObjects.GameObject;
+import PictureButton from "../assets/objects/PictureButton";
+import {GameScene, GameStatus} from "../GameStatus";
 
 export class Title extends Phaser.Scene {
 
-  init() {
-    console.log("Title");
-  }
+  private gameObjects: Array<GameObject> = []
+  private gameStatus : GameStatus  = new GameStatus(this)
 
-  preload() {
-    // SIZE = 336x240
-    console.log("Title preload");
-
-
-  }
+  //   this.gameStatus = new GameStatus(this)
+  // }
 
   create() {
-    console.log("Title create");
-
-
-    if (IS_PROD) {
-      Globals.playTitleMusic(this)
-      this.showDucksLogo()
-    } else if (NODE_ENV === "demo-game") {
-      this.scene.start('demo-game')
-    } else {
-      this.scene.start('game')
-    }
+    Globals.playTitleMusic(this)
+    this.showDucksLogo()
   }
 
   private showDucksLogo(): void {
@@ -59,37 +47,68 @@ export class Title extends Phaser.Scene {
     this.cameras.main.fadeIn(800);
 
     this.addGameButton()
+    this.writeGameText()
   }
 
   private addGameButton(): void {
-    let gameButton = this.add.sprite(100, 200, ImageAssets.BLUE_BUTTON_1).setInteractive();
-    this.centerButton(gameButton, 100);
+    let gameButton = new PictureButton(this, 100, Globals.gameHeight - 70, ImageAssets.BLUE_BUTTON_1, ImageAssets.BLUE_BUTTON_2, "Play", () => this.playButtonClick())
+    this.gameObjects.push(gameButton);
+  }
 
-    let gameText = this.add.text(0, 0, 'Play', {fontSize: '32px', fill: '#fff'});
-    this.centerButtonText(gameText, gameButton);
-
-    gameButton.on('pointerup', (pointer: any) => {
-      this.time.delayedCall(300, () => {
-        this.cameras.main.fadeOut(500);
-        this.time.delayedCall(700, () => this.scene.start('game'))
-      })
+  private playButtonClick() {
+    this.time.delayedCall(300, () => {
+      this.gameObjects.forEach(it => it.destroy())
+      this.gameStatus.startScene(GameScene.HOME)
     })
+  }
 
-    this.input.on('pointerover', (event: any, gameObjects: any) => {
-      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_2);
-    });
-    this.input.on('touchstart', (event: any, gameObjects: any) => {
-      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_2);
-    });
-    this.input.on('pointerout', function (event: any, gameObjects: any) {
-      gameObjects[0].setTexture(ImageAssets.BLUE_BUTTON_1);
-    });
+
+  private writeGameText(): void {
+    var text1 = this.make.text({
+      x: Globals.gameWidth / 2,
+      y: Globals.gameHeight - 220,
+      text: '0%',
+      style: {
+        font: '42px monospace',
+        "font-weight": '28pxbold',
+        fill: '#ffffff'
+      }
+    })
+      .setOrigin(0.5, 0.5)
+      .setText("Inga Ducks")
+
+    var text2 = this.make.text({
+      x: Globals.gameWidth / 2,
+      y: Globals.gameHeight - 160,
+      text: '0%',
+      style: {
+        font: '24px monospace',
+        fill: '#ffffff'
+      }
+    })
+      .setOrigin(0.5, 0.5)
+      .setText("Keep her alive")
+
+    var text3 = this.make.text({
+      x: Globals.gameWidth / 2,
+      y: Globals.gameHeight - 135,
+      text: '0%',
+      style: {
+        font: '16px monospace',
+        fill: '#ffffff'
+      }
+    })
+      .setOrigin(0.5, 0.5)
+      .setText("(at least until she turns 40)")
+
+
+    this.gameObjects.push(text1, text2, text3);
   }
 
   private centerButton(gameObject: any, offset = 0) {
     Phaser.Display.Align.In.Center(
       gameObject,
-      this.add.zone(Globals.gameWidth / 2, Globals.gameHeight / 2 + (offset), window.innerWidth, window.innerHeight)
+      this.add.zone(Globals.gameWidth, Globals.gameHeight / 2 + (offset), window.innerWidth, window.innerHeight)
     );
   }
 

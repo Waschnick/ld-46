@@ -1,5 +1,17 @@
 import Scene = Phaser.Scene;
 
+export enum BitmapFonts {
+  DESYREL = "DESYREL"
+}
+
+const BitmapFontsImage: { [key: string]: string; } = {
+  [BitmapFonts.DESYREL]: require('./images/fonts/desyrel.png').default,
+}
+
+const BitmapFontsDesc: { [key: string]: string; } = {
+  [BitmapFonts.DESYREL]: require('./images/fonts/desyrel.xml').default,
+}
+
 const pngAssets: { [key: string]: string; } = {
   [ImageAssets.DUCKS_LOGO]: require('./images/DucksScreen.png').default,
   [ImageAssets.TITLE_IMAGE]: require('./images/TitleScreen.png').default,
@@ -7,6 +19,7 @@ const pngAssets: { [key: string]: string; } = {
   [ImageAssets.BLUE_BUTTON_2]: require('./images/ui/blue_button_2.png').default,
   [ImageAssets.STATS_BUTTON_1]: require('./images/ui/stats_button_1.png').default,
   [ImageAssets.STATS_BUTTON_2]: require('./images/ui/stats_button_2.png').default,
+  [ImageAssets.MOVING_BUTTON_1]: require('./images/ui/button-vertical.png').default,
 }
 
 export const enum ImageAssets {
@@ -16,14 +29,15 @@ export const enum ImageAssets {
   BLUE_BUTTON_2 = "BLUE_BUTTON_2",
   STATS_BUTTON_1 = "STATS_BUTTON_1",
   STATS_BUTTON_2 = "STATS_BUTTON_2",
+  MOVING_BUTTON_1 = "MOVING_BUTTON_1",
 }
 
 // AUDIO
 
 const audioOggAssets: { [key: string]: string; } = {
-  [AudioAssets.DUCKS_QUAK_SOUND]: require('./audio/duck.ogg').default,
+  [AudioAssets.DUCKS_QUAK_SOUND]: require('./audio/duck.mp3').default,
   [AudioAssets.TITLE_SONG]: require('./audio/title_song.mp3').default,
-  [AudioAssets.BLIP_01]: require('./audio/blip.wav').default,
+  [AudioAssets.BLIP_01]: require('./audio/blip.mp3').default,
 
 }
 
@@ -34,12 +48,6 @@ export const enum AudioAssets {
 }
 
 // SPRITES
-
-// key, sourcefile, framesize x, framesize y
-// game.load.spritesheet('mario', 'assets/misc/mariospritesheet-small.png',50,50); // key, sourcefile, framesize x, framesize y
-
-// Tiles
-
 export const enum Sprites {
   DWARF = "Dwarf",
   INGA = "Inga1",
@@ -52,21 +60,26 @@ const spritSheetsAssets: { [key: string]: string; } = {
   [Sprites.INGA]: require('./sprites/inga-sprite-sheet.png').default,
 }
 
+// TILES
 // HINT: This is part of the JSON file and needs to be the same key!!!
 export const enum TileImageSetKeys {
-  DESERT = "Desert"
+  DESERT = "Desert",
+  CITY = "City",
 }
 
 const tileImageSetAssets: { [key: string]: string; } = {
   [TileImageSetKeys.DESERT]: require('./tilemaps/tmw_desert_spacing.png').default,
+  [TileImageSetKeys.CITY]: require('./tilemaps/city.png').default,
 }
 
 export const enum TileJsonMaps {
-  MAP1 = "DesertMap1"
+  MAP1 = "DesertMap1",
+  CITY = "CityMap1",
 }
 
 const tileJsonMapAssets: { [key: string]: string; } = {
   [TileJsonMaps.MAP1]: require('./tilemaps/desert.json').default,
+  [TileJsonMaps.CITY]: require('./tilemaps/city.json').default,
 }
 
 function loadTiles(scene: Scene) {
@@ -86,6 +99,14 @@ function loadAssets(scene: Scene) {
   loadAudio(scene)
   loadImages(scene)
   loadTiles(scene)
+
+  Object.keys(audioOggAssets).forEach(key => {
+    scene.load.audio(key, [audioOggAssets[key]]);
+  })
+
+  for (let bitmapFont in BitmapFonts) {
+    scene.load.bitmapFont(bitmapFont, BitmapFontsImage[bitmapFont], BitmapFontsDesc[bitmapFont]);
+  }
 
 
   //  37x45 is the size of each frame

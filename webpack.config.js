@@ -32,7 +32,7 @@ defaultConfig = {
       // {test: [/\.vert$/, /\.frag$/], use: 'raw-loader'}, // shaders
       // {test: /assets([\/\\])/, type: 'javascript/auto', loader: 'file-loader?name=[hash].[ext]'},
       {
-        test: /\.(png|jpe?g|gif|svg|ico|ogg|mp3|wav)$/,
+        test: /\.(png|jpe?g|gif|svg|ico|ogg|mp3|wav|xml)$/,
         loader: 'file-loader',
         options: {
           name: '[path][name].[ext]?[hash]',

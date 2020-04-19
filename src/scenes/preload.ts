@@ -1,11 +1,13 @@
 import * as Phaser from "phaser";
 import Assets from "../assets/assets";
 import Globals from "../globals";
+import GameObject = Phaser.GameObjects.GameObject;
+import {GameStatus} from "../GameStatus";
 
 export class Preload extends Phaser.Scene {
-  init() {
-    console.log("Preloading");
-  }
+
+  private gameObjects: Array<GameObject> = []
+  private gameStatus: GameStatus = new GameStatus(this)
 
   preload() {
     console.log("Load things necessary for Game scene, cam:", this.cameras.main.width, this.cameras.main.height);
@@ -14,27 +16,15 @@ export class Preload extends Phaser.Scene {
     // this.load.setPath('assets/');
     // this.load.setBaseURL('http://labs.phaser.io');
 
-
-    // for (var i = 0; i < 500; i++) {
-    //   this.load.image('logo' + i, Assets.ducksLogo().png);
-    // }
-
-    // this.add.image(100, 100, Assets.ducksLogo().name);
-
-    // Load all images
-
-    // Load all sounds
-    // this.game.sound.
-
-    //width: window.innerWidth,
-    //   height: window.innerHeight
-
     // cf. https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/?a=13
     var progressBox = this.add.graphics();
+    this.gameObjects.push(progressBox);
+
     var progressBar = this.add.graphics();
+    this.gameObjects.push(progressBar);
+
     progressBox.fillStyle(0x222222, 0.8);
     progressBox.fillRect(10, 270, Globals.gameWidth - 20, 50);
-    // progressBox.fillRect(240, 270, 320, 50);
 
     var width = this.cameras.main.width;
     var height = this.cameras.main.height;
@@ -48,6 +38,7 @@ export class Preload extends Phaser.Scene {
       }
     });
     loadingText.setOrigin(0.5, 0);
+    this.gameObjects.push(loadingText);
 
     var percentText = this.make.text({
       x: width / 2,
@@ -59,6 +50,7 @@ export class Preload extends Phaser.Scene {
       }
     });
     percentText.setOrigin(0.5, 0.5);
+    this.gameObjects.push(percentText);
 
 
     var assetText = this.make.text({
@@ -71,6 +63,7 @@ export class Preload extends Phaser.Scene {
       }
     });
     assetText.setOrigin(0.5, 0.5);
+    this.gameObjects.push(assetText);
 
     this.load.on('progress', (value: number) => {
       progressBar.clear();
@@ -95,28 +88,41 @@ export class Preload extends Phaser.Scene {
 
       loadingText.setText("100%")
       percentText.setText("Loading finished.")
-      assetText.setStyle({font: "24px", "font-weight": "bold"}).setText("Click to start.")
+      assetText.setStyle({font: "24px", "font-weight": "bold"}).setText("Click to write.")
 
       if (IS_PROD) {
         this.time.delayedCall(500, () => {
-
-
         }, [], this);
       } else {
         ready();
       }
     });
 
+    this.writeVersion()
+
     let ready = () => {
-      progressBar.destroy();
-      progressBox.destroy();
-      loadingText.destroy();
-      percentText.destroy();
-      assetText.destroy();
-      this.scene.start('title');
+      this.gameObjects.forEach(it => it.destroy())
+      this.gameObjects = [];
+
+      this.gameStatus.goToStartSceneAfterPreload()
     }
 
     Assets.loadAssets(this)
+  }
+
+  private writeVersion(): void {
+    var versionText = this.make.text({
+      x: 10,
+      y: Globals.gameHeight - 14,
+      text: '0%',
+      style: {
+        font: '14px monospace',
+        fill: '#ffffff'
+      }
+    });
+    versionText.setOrigin(0, 0.5);
+    versionText.setText(BUNDLE_VERSION)
+    this.gameObjects.push(versionText);
   }
 
 

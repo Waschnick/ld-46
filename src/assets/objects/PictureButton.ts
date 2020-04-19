@@ -39,6 +39,8 @@ export default class PictureButton extends Phaser.GameObjects.Container {
       })
     });
 
+    this.setScrollFactor(0)
+
     this.scene.add.existing(this);
   }
 }

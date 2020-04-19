@@ -3,7 +3,7 @@
     {
      "chunksize":
         {
-         "height":64,
+         "height":32,
          "width":32
         },
      "export":
