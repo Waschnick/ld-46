@@ -14,9 +14,9 @@ export class Shop extends Phaser.Scene {
 
   create() {
 
-    let menuButton1 = new PictureButton(this, 10, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'Home', () => this.gameStatus.switchScene(GameScene.HOME));
+    let menuButton1 = new PictureButton(this, 10, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, () => this.gameStatus.switchScene(GameScene.HOME), 'Home');
 
-    let menuButton2 = new PictureButton(this, Globals.gameWidth - 10 - 140, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'City', () => this.gameStatus.switchScene(GameScene.CITY));
+    let menuButton2 = new PictureButton(this, Globals.gameWidth - 10 - 140, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, () => this.gameStatus.switchScene(GameScene.CITY), 'City');
 
   }
 

@@ -14,7 +14,7 @@ const Globals = {
   soundOn: true,
   musicOn: true,
   bgMusicPlaying: true,
-  gameWidth: Math.min(window.innerWidth, 375),
+  gameWidth: Math.min(window.innerWidth, 420),
   gameHeight: Math.min(window.innerHeight, 800),
   currentMusic: {} as BaseSound,
   timeIncreaseEventEmitter: {} as EventEmitter,

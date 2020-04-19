@@ -8,6 +8,7 @@ import Tilemap = Phaser.Tilemaps.Tilemap;
 import Tileset = Phaser.Tilemaps.Tileset;
 import StaticTilemapLayer = Phaser.Tilemaps.StaticTilemapLayer;
 import Graphics = Phaser.GameObjects.Graphics;
+import GameObject = Phaser.GameObjects.GameObject;
 
 export class City extends Phaser.Scene {
 
@@ -18,14 +19,16 @@ export class City extends Phaser.Scene {
   private mapLayer2: StaticTilemapLayer = {} as StaticTilemapLayer;
   private gameStatus: GameStatus = new GameStatus(this)
 
+  private buttonLeft!: PictureButton;
+  private buttonRight!: PictureButton;
+  private buttonUp!: PictureButton;
+  private buttonDown!: PictureButton;
+
   /**
    * Collision: https://phaser.io/examples/v3/view/game-objects/tilemap/static/set-colliding-by-collision-data
    */
 
   create() {
-    let menuButton1 = new PictureButton(this, 10, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'Home', () => this.gameStatus.switchScene(GameScene.HOME));
-
-    let menuButton2 = new PictureButton(this, Globals.gameWidth - 10 - 140, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'Shop', () => this.gameStatus.switchScene(GameScene.SHOP));
 
     this.map = this.make.tilemap({key: TileJsonMaps.CITY});
     let tileset: Tileset = this.map.addTilesetImage(TileImageSetKeys.CITY);
@@ -33,38 +36,28 @@ export class City extends Phaser.Scene {
     this.mapLayer1 = this.map.createStaticLayer(0, tileset, 0, 0).setScale(2);
 
     this.mapLayer1.setCollisionFromCollisionGroup(true)
-    // this.mapLayer1.setCollisionByProperty(true)
-    // HINT: The difference between map.createLayer and map.createStaticLayer
-// this.map.call
-    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
     this.player = createSpriteCharacter(SpriteCharacters.IngaChild, this).setPosition(250, 660)
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player, false);
-    //
+
     // this.physics.add.existing(this.player)
     // this.physics.add.collider(this.player, this.mapLayer1)
 
 
-    if (!IS_PROD) {
-      let shapeGraphics = this.add.graphics();
-      this.drawCollisionShapes(shapeGraphics);
-    }
-
     // Get the layers registered with Matter. Any colliding tiles will be given a Matter body. We
     // haven't mapped our collision shapes in Tiled so each colliding tile will get a default
     // rectangle body (similar to AP).
-    this.matter.world.convertTilemapLayer(this.mapLayer1);
-    this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
+    // this.matter.world.convertTilemapLayer(this.mapLayer1);
+    // this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
 
     this.matter.world.on('collisionstart', (event: any, bodyA: any, bodyB: any) => {
       console.log('collision', event, bodyA, bodyB);
     });
 
     // this.player.setOnCollideWith(this.mapLayer1)
-
     // this.matter.add.gameObject(this.player, {})
     // this.physics.add.collider(this.player, this.mapLayer1);
 
@@ -82,16 +75,45 @@ export class City extends Phaser.Scene {
 
     // this.matter.enableCollisionEventsPlugin()
 
+    // if (!IS_PROD) {
+    //   let shapeGraphics = this.add.graphics();
+    //   this.drawCollisionShapes(shapeGraphics);
+    //
+    //   var debugGraphics = this.add.graphics();
+    //   debugGraphics.setScale(2);
+    //   this.mapLayer1.renderDebug(debugGraphics, {
+    //     tileColor: null, //new Phaser.Display.Color(105, 210, 231, 200), // Non colliding tiles
+    //     collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200), // Colliding tiles
+    //     faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Interesting faces, i.e. colliding edges
+    //   });
+    // }
 
-    if (!IS_PROD) {
-      var debugGraphics = this.add.graphics();
-      debugGraphics.setScale(2);
-      this.mapLayer1.renderDebug(debugGraphics, {
-        tileColor: null, //new Phaser.Display.Color(105, 210, 231, 200), // Non colliding tiles
-        collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200), // Colliding tiles
-        faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Interesting faces, i.e. colliding edges
-      });
-    }
+    this.addUiControls()
+  }
+
+  addUiControls() {
+    this.buttonUp = new PictureButton(this, Globals.gameWidth - 120, Globals.gameHeight - 240, ImageAssets.GREY_BUTTON_1, ImageAssets.GREY_BUTTON_2,
+      () => {
+      })
+    this.buttonDown = new PictureButton(this, Globals.gameWidth - 120, Globals.gameHeight - 120, ImageAssets.GREY_BUTTON_1, ImageAssets.GREY_BUTTON_2,
+      () => {
+      })
+
+    this.buttonLeft = new PictureButton(this, Globals.gameWidth - 168, Globals.gameHeight - 180, ImageAssets.GREY_BUTTON_1, ImageAssets.GREY_BUTTON_2,
+      () => {
+      })
+    this.buttonRight = new PictureButton(this, Globals.gameWidth - 70, Globals.gameHeight - 180, ImageAssets.GREY_BUTTON_1, ImageAssets.GREY_BUTTON_2,
+      () => {
+      })
+
+
+    let menuButton1 = new PictureButton(this, 10, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2,
+      () => this.gameStatus.switchScene(GameScene.HOME),
+      'Home');
+
+    let menuButton2 = new PictureButton(this, Globals.gameWidth - 10 - 140, Globals.gameHeight - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2,
+      () => this.gameStatus.switchScene(GameScene.SHOP),
+      'Shop');
 
   }
 
@@ -119,16 +141,16 @@ export class City extends Phaser.Scene {
         // console.info("can player collide?", this.matter.detector.canCollide(this.player, this.map), this.matter.detector.canCollide(this.player, this.mapLayer1), this.matter.detector.canCollide(this.player, this.mapLayer2))
       }
 
-      if (this.cursors.left.isDown) {
+      if (this.cursors.left.isDown || this.buttonLeft.isPressed) {
         this.player.moveX(-2 * factor);
-      } else if (this.cursors.right.isDown) {
+      } else if (this.cursors.right.isDown || this.buttonRight.isPressed) {
         this.player.moveX(2 * factor);
       }
 
-      if (this.cursors.down.isDown) {
+      if (this.cursors.down.isDown || this.buttonDown.isPressed) {
         this.player.moveY(2 * factor);
 
-      } else if (this.cursors.up.isDown) {
+      } else if (this.cursors.up.isDown || this.buttonUp.isPressed) {
         this.player.moveY(-2 * factor);
       }
     }
@@ -136,9 +158,6 @@ export class City extends Phaser.Scene {
 
   // HINT: Does not use our scale
   drawCollisionShapes(graphics: Graphics) {
-
-
-    let scale = 1
     graphics.clear();
     graphics.setScale(2)
     graphics.lineStyle(0.5, 0xFFFF00FC);
@@ -166,7 +185,7 @@ export class City extends Phaser.Scene {
         // When objects are parsed by Phaser, they will be guaranteed to have one of the
         // following properties if they are a rectangle/ellipse/polygon/polyline.
         if (object.rectangle) {
-          graphics.strokeRect(objectX, objectY, object.width * scale, object.height * scale);
+          graphics.strokeRect(objectX, objectY, object.width, object.height);
         } else if (object.ellipse) {
           // Ellipses in Tiled have a top-left origin, while ellipses in Phaser have a center
           // origin
@@ -180,13 +199,20 @@ export class City extends Phaser.Scene {
           for (var j = 0; j < originalPoints.length; j++) {
             var point = originalPoints[j];
             points.push({
-              x: (objectX + point.x) * scale,
-              y: (objectY + point.y) * scale
+              x: (objectX + point.x),
+              y: (objectY + point.y)
             });
           }
           graphics.strokePoints(points);
         }
       }
     });
+  }
+
+  debugAsdf(obj: GameObject) {
+    let gfx = this.add.graphics();
+    let body = obj.body as Phaser.Physics.Impact.Body;
+    // body.touches()
+    // gfx.lineBetween(body.left, body.bottom, body.right, body.bottom);
   }
 }

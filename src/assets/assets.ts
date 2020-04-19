@@ -19,7 +19,8 @@ const pngAssets: { [key: string]: string; } = {
   [ImageAssets.BLUE_BUTTON_2]: require('./images/ui/blue_button_2.png').default,
   [ImageAssets.STATS_BUTTON_1]: require('./images/ui/stats_button_1.png').default,
   [ImageAssets.STATS_BUTTON_2]: require('./images/ui/stats_button_2.png').default,
-  [ImageAssets.MOVING_BUTTON_1]: require('./images/ui/button-vertical.png').default,
+  [ImageAssets.GREY_BUTTON_1]: require('./images/ui/button_greyed_1.png').default,
+  [ImageAssets.GREY_BUTTON_2]: require('./images/ui/button_greyed_2.png').default,
 }
 
 export const enum ImageAssets {
@@ -29,7 +30,8 @@ export const enum ImageAssets {
   BLUE_BUTTON_2 = "BLUE_BUTTON_2",
   STATS_BUTTON_1 = "STATS_BUTTON_1",
   STATS_BUTTON_2 = "STATS_BUTTON_2",
-  MOVING_BUTTON_1 = "MOVING_BUTTON_1",
+  GREY_BUTTON_1 = "GREY_BUTTON_1",
+  GREY_BUTTON_2 = "GREY_BUTTON_2",
 }
 
 // AUDIO

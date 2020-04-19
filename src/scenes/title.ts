@@ -8,7 +8,7 @@ import {GameScene, GameStatus} from "../GameStatus";
 export class Title extends Phaser.Scene {
 
   private gameObjects: Array<GameObject> = []
-  private gameStatus : GameStatus  = new GameStatus(this)
+  private gameStatus: GameStatus = new GameStatus(this)
 
   //   this.gameStatus = new GameStatus(this)
   // }
@@ -51,7 +51,7 @@ export class Title extends Phaser.Scene {
   }
 
   private addGameButton(): void {
-    let gameButton = new PictureButton(this, 100, Globals.gameHeight - 70, ImageAssets.BLUE_BUTTON_1, ImageAssets.BLUE_BUTTON_2, "Play", () => this.playButtonClick())
+    let gameButton = new PictureButton(this, 100, Globals.gameHeight - 70, ImageAssets.BLUE_BUTTON_1, ImageAssets.BLUE_BUTTON_2, () => this.playButtonClick(), "Play")
     this.gameObjects.push(gameButton);
   }
 

@@ -20,6 +20,8 @@ export class Home extends Phaser.Scene {
   statusBarHeight: number = 240;
   statusBarYOffset: number = this.height - this.statusBarHeight;
 
+  typewriter!: Typewriter
+
   statusText!: Text
   moneyCount!: Text
   healthStatus!: StatusElement
@@ -38,29 +40,37 @@ export class Home extends Phaser.Scene {
     Globals.fadeOutTitleMusic(this)
     Globals.onIncreaseDay(this.updateDay.bind(this));
 
-    /**
-     * typewriter.init(gameInstance, {
-     *   x: 290,
-     *   y: 40,
-     *   fontFamily: "chillerBlack",
-     *   fontSize: 26,
-     *   maxWidth: 300,
-     *   sound: reg.track,
-     *   text: "Some text to be typed!"
-     * });
-     * typewriter.write();
-     */
-
-
-      // this.cameras.main.setZoom(2)
-
-
     let map: Tilemap = this.make.tilemap({key: TileJsonMaps.MAP1});
     let tileset: Tileset = map.addTilesetImage(TileImageSetKeys.DESERT);
-    let layer: StaticTilemapLayer = map.createStaticLayer(0, tileset, 0, 0);
-    layer.setScale(2)
+    let layer: StaticTilemapLayer = map.createStaticLayer(0, tileset, 0, 0).setScale(2);
+
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
+
+    // let frameView = this.add.graphics({fillStyle: {color: 0xff00ff}, x: 0, y: 0}).setScale(3).setAlpha(0.7);
+    // let girl1: SpriteCharacter = createSpriteCharacter(SpriteCharacters.IngaChild, this)
+    // girl1.setPosition(0, 90)
+    // frameView.fillRect(girl1.frame.cutX, girl1.frame.cutY, 32, 32);
+
+    this.createStatusBar()
+    this.writeIntroText()
+  }
+
+  writeIntroText() {
+    let typewriter = new Typewriter(this, {
+      x: 10,
+      y: 100,
+      time: 70,
+      fontFamily: BitmapFonts.DESYREL,
+      fontSize: 36,
+      maxWidth: Globals.gameWidth - 20,
+    } as TypewriterOptions)
+    typewriter.writeAndClear("Inga is 6 years old, lifes in the basement and her pocket money is 20$ per week.", () => {
+      typewriter.writeAndClear("Try to keep her alive.         ")
+    })
+  }
+
+  createStatusBar() {
     let statusBox = this.add.graphics();
     statusBox.fillStyle(0x222222, 1);
     statusBox.fillRect(0, this.statusBarYOffset, this.width, this.statusBarHeight);
@@ -91,35 +101,11 @@ export class Home extends Phaser.Scene {
     this.funStatus = new StatusElement(this, "Fun:", 125)
 
 
-    let menuButton1 = new PictureButton(this, 10, this.height - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'Shop', () => this.gameStatus.switchScene(GameScene.SHOP));
+    let menuButton1 = new PictureButton(this, 10, this.height - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, () => this.gameStatus.switchScene(GameScene.SHOP), 'Shop');
+    let menuButton2 = new PictureButton(this, this.width - 10 - 140, this.height - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, () => this.gameStatus.switchScene(GameScene.CITY), 'City');
 
-    let menuButton2 = new PictureButton(this, this.width - 10 - 140, this.height - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'City', () => this.gameStatus.switchScene(GameScene.CITY));
-
-
-    let frameView = this.add.graphics({fillStyle: {color: 0xff00ff}, x: 0, y: 0}).setScale(3).setAlpha(0.7);
-    let girl1: SpriteCharacter = createSpriteCharacter(SpriteCharacters.IngaChild, this)
-    // girl1.setPosition(0, 90)
-
-    frameView.fillRect(girl1.frame.cutX, girl1.frame.cutY, 32, 32);
-
-    this.time.delayedCall(500, () => this.gameStatus.showMessage("You are 6 years old. Your allowance is 50$ per week."))
-
-
-    let typewriter = new Typewriter(this, {
-      x: 10,
-      y: 100,
-      time: 70,
-      fontFamily: BitmapFonts.DESYREL,
-      fontSize: 36,
-      maxWidth: Globals.gameWidth - 20,
-      endFn: () => {
-        this.time.delayedCall(3000, () => {
-          typewriter.clear()
-        })
-      }
-    } as TypewriterOptions)
-    typewriter.write("You are 6 years old, life in the basement and your pocket money is 20$ per week")
   }
+
 
   updateDay() {
     let charVals = Globals.characterValues;

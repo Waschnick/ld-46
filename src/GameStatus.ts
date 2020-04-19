@@ -43,7 +43,7 @@ export class GameStatus {
     } else if (NODE_ENV === "demo-game") {
       this.scene.scene.start(GameScene.DEMO_GAME);
     } else {
-      this.scene.scene.start(GameScene.HOME);
+      this.scene.scene.start(GameScene.CITY);
     }
   }
 

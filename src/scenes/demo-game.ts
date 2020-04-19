@@ -47,8 +47,6 @@ export class DemoGame extends Phaser.Scene {
     });
 
 
-    let menuButton1 = new PictureButton(this, 10, this.height - 40, ImageAssets.STATS_BUTTON_1, ImageAssets.STATS_BUTTON_2, 'Menu', () => console.info("StatsButton1"));
-
     //  Frame debug view
     this.frameView = this.add.graphics({fillStyle: {color: 0xff00ff}, x: 32, y: 32});
 

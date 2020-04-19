@@ -111,6 +111,19 @@ export class Preload extends Phaser.Scene {
   }
 
   private writeVersion(): void {
+    var compileTypeText = this.make.text({
+      x: 10,
+      y: Globals.gameHeight - 28,
+      text: '0%',
+      style: {
+        font: '14px monospace',
+        fill: '#ffffff'
+      }
+    });
+    compileTypeText.setOrigin(0, 0.5);
+    compileTypeText.setText(IS_PROD ? "Release Build" : "Development Build")
+    this.gameObjects.push(compileTypeText);
+
     var versionText = this.make.text({
       x: 10,
       y: Globals.gameHeight - 14,

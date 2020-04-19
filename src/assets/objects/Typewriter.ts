@@ -13,7 +13,6 @@ export interface TypewriterOptions {
   x: number;
   text: string;
   times: number;
-  endFn: any;
   writerFn: any;
   sound: any;
   soundMarker: any;
@@ -36,33 +35,10 @@ export class Typewriter {
   constructor(scene: Scene, options: TypewriterOptions) {
     this.scene = scene
 
-    // return {
-    //   init: function(gameInstance, options) {
-    //     init(gameInstance, options);
-    //   },
-    //   write: function() {
-    //     stop();
-    //     write();
-    //   },
-    //   destroy: function() {
-    //     this.typedText.destroy();
-    //   },
-    //   hideText: function() {
-    //     this.typedText.visible = false;
-    //   },
-    //   showText: function() {
-    //     this.typedText.visible = true;
-    //   },
-    //   moveToTop: function() {
-    //     game.bringToTop(this.typedText);
-    //   }
-    // }
-
     this.options.time = options.time || 100;
     this.options.sound = options.sound || null;
     this.options.soundMarker = options.soundMarker || null;
     this.options.writerFn = options.writerFn || null;
-    this.options.endFn = options.endFn || null;
     this.options.times = options.times || 10;
     this.options.text = options.text || "";
     this.options.x = options.x || 100;
@@ -74,7 +50,15 @@ export class Typewriter {
   }
 
 
-  write(text?: string) {
+  writeAndClear(text?: string, finishedCallback?: Function) {
+    this.write(text, () => {
+      this.scene.time.delayedCall(3000, () => {
+        this.clear(finishedCallback)
+      })
+    })
+  }
+
+  write(text?: string, finishedCallback?: Function) {
     this.options.text = text || this.options.text
 
     if (this.options.writerObj === null) {
@@ -84,14 +68,6 @@ export class Typewriter {
     }
     this.typedText.maxWidth = this.options.maxWidth;
     this.currentLetter = 0;
-
-    let length = this.options.text.length
-    // let length = this.typedText.children.length;
-    //
-    // for (let i = 0; i < length; i++) {
-    //   let letter = this.typedText.getChildAt(i);
-    //   letter.alpha = 0;
-    // }
 
     if (this.options.sound !== null) { // Made some alterations for sound markers here. ~Tilde
       if (this.options.soundMarker !== null) {
@@ -103,7 +79,7 @@ export class Typewriter {
 
     this.typedText.x = this.options.x;
     this.typedText.y = this.options.y;
-    this.countdown(length, this.options.endFn);
+    this.countdown(this.options.text.length, finishedCallback);
   }
 
   stop() {
@@ -120,12 +96,16 @@ export class Typewriter {
 
 
   countdown(times: number, endFn: any) {
-    let endCallback = endFn || (() => {
+    let endCallback = (() => {
       this.timer.destroy();
       if (this.options.sound !== null) {
         this.options.sound.stop();
       }
+      if (endFn) {
+        endFn()
+      }
     });
+
     this.timer = this.scene.time.addEvent({
       delay: this.options.time,
       repeat: times,
