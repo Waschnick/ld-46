@@ -82,7 +82,7 @@ export default class SpriteCharacter extends Phaser.Physics.Matter.Sprite {
   }
 
   walk(facing: CharacterFacing): this {
-    console.info("Walk", facing)
+    // console.info("Walk", facing)
     this.anims.play(facing);
     this.anims.setYoyo(true)
     this.anims.setRepeat(-1)
@@ -111,12 +111,12 @@ export default class SpriteCharacter extends Phaser.Physics.Matter.Sprite {
   }
 
   private moveInFacing() {
-    console.info("Ismoving", this.isMoving, this.anims.getCurrentKey(), this.facing)
+    // console.info("Ismoving", this.isMoving, this.anims.getCurrentKey(), this.facing)
 
     let isNotCurrentAnimation = this.anims.getCurrentKey() !== this.facing
 
     if (isNotCurrentAnimation || !this.isMoving || !this.anims.isPlaying) {
-      this.anims.play(this.facing);
+      this.anims.play(this.facing, true);
       this.isMoving = true
     }
   }

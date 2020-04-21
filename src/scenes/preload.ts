@@ -121,7 +121,7 @@ export class Preload extends Phaser.Scene {
       }
     });
     compileTypeText.setOrigin(0, 0.5);
-    compileTypeText.setText(IS_PROD ? "Release Build" : "Development Build")
+    compileTypeText.setText("Phaser " + Phaser.VERSION + (IS_PROD ? " | Release Build" : "Development Build"))
     this.gameObjects.push(compileTypeText);
 
     var versionText = this.make.text({
