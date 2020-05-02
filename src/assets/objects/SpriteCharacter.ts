@@ -34,14 +34,19 @@ export default class SpriteCharacter extends Phaser.Physics.Matter.Sprite {
     super(scene.matter.world, x, y, sprite, 0)
 
     this.setOnCollide(() => console.info("COllide"))
-    this.setFrictionAir(0.0005)
-    this.setBounce(.1)
-    this.setRectangle(20, 24, {onCollideCallback: () => console.info("coll")})
+    // this.setFrictionAir(0.0005)
+    // this.setBounce(.1)
+    // this.setMass(64)
+    this.setRectangle(10, 20, {
+      onCollideCallback: () => console.info("coll"),
+      position: {x: 20, y: 20}
+    })
+
     // this.setInteractive()
     this.scene = scene
     this.setScale(3)
+    // this.body.scale = 3
     // this.setOrigin(0, 0)
-
 
     this.setOriginFromFrame()
 
@@ -106,12 +111,15 @@ export default class SpriteCharacter extends Phaser.Physics.Matter.Sprite {
       this.facing = CharacterFacing.FACING_LEFT;
     }
     this.x += value
+    // this.setVelocityX(value)
 
     this.moveInFacing()
   }
 
   private moveInFacing() {
     // console.info("Ismoving", this.isMoving, this.anims.getCurrentKey(), this.facing)
+    // this.setVelocity(1, 1)
+    this.setAwake()
 
     let isNotCurrentAnimation = this.anims.getCurrentKey() !== this.facing
 
@@ -129,6 +137,7 @@ export default class SpriteCharacter extends Phaser.Physics.Matter.Sprite {
       this.facing = CharacterFacing.FACING_UP;
     }
     this.y += value
+    // this.setVelocityY(value)
 
     this.moveInFacing()
   }

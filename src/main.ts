@@ -37,7 +37,11 @@ class Main extends Phaser.Game {
       physics: {
         default: 'matter',
         matter: {
-          debug: !IS_PROD,
+          debug: IS_PROD ? false : {
+            showSleeping: true,
+            sleepFillColor: 0x464646,
+            sleepLineColor: 0x999a99,
+          },
           // enableSleeping: false,
           enableSleeping: true,
           gravity: false

@@ -11,6 +11,7 @@ import Graphics = Phaser.GameObjects.Graphics;
 import GameObject = Phaser.GameObjects.GameObject;
 import ScaleModes = Phaser.Scale.ScaleModes;
 import ObjectLayer = Phaser.Tilemaps.ObjectLayer;
+import MatterBody = Phaser.Types.Physics.Matter.MatterBody;
 
 export class City extends Phaser.Scene {
 
@@ -57,30 +58,24 @@ export class City extends Phaser.Scene {
 
     this.mapLayerBuildings.setCollisionFromCollisionGroup(true)
 
-    this.player = createSpriteCharacter(SpriteCharacters.IngaChild, this).setPosition(250, 660)
-    this.cursors = this.input.keyboard.createCursorKeys();
 
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+    this.matter.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+
+    this.player = createSpriteCharacter(SpriteCharacters.IngaChild, this).setPosition(250, 660)
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+
     this.cameras.main.startFollow(this.player, false);
 
-    // this.physics.add.existing(this.player)
-    // this.physics.add.collider(this.player, this.mapLayerBackground)
-
-    // let M = Phaser.Physics.Matter;
-    let matterCategory = this.matter.world.nextCategory()
-    this.mapLayerObjects.objects.forEach(object => {
-      let tiledObject = this.matter.add.rectangle(object.x! * 2, object.y! * 2, object.width! * 2, object.height! * 2)
-      // let tiledObject = this.matter.bodies.rectangle(object.x, object.y, object.width, object.height)
-      this.matter.setCollisionCategory(tiledObject.parts, matterCategory)
-      // tiledObject.setCollidesWith([this.player]);
-    });
-    this.player.setCollidesWith(matterCategory);
+    this.createMatterObjectsFromTiledObjectLayer()
 
     // Get the layers registered with Matter. Any colliding tiles will be given a Matter body. We
     // haven't mapped our collision shapes in Tiled so each colliding tile will get a default
     // rectangle body (similar to AP).
     this.matter.world.convertTilemapLayer(this.mapLayerBuildings);
-    this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
+    // this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
+    // this.matter.add.worldConstraint(this.player);
 
     this.matter.world.on('collisionstart', (event: any, bodyA: any, bodyB: any) => {
       console.log('collision', event, bodyA, bodyB);
@@ -102,7 +97,7 @@ export class City extends Phaser.Scene {
     });
 
     this.matter.world.on('collisionactive', function (event: any) {
-      console.info("collisionactive", event)
+      console.info("collisionactive", event.pairs, event)
     });
 
     // Update over, so now we can determine if any direction is blocked
@@ -112,21 +107,6 @@ export class City extends Phaser.Scene {
 
     // this.player.setOnCollideWith(this.mapLayerBuildings.body, () => console.info("setOnCollideWith"))
     // this.matter.add.gameObject(this.player, {})
-    // this.physics.add.collider(this.player, this.mapLayerBackground);
-
-
-    // Drop bouncy, Matter balls on pointer down
-    // this.input.on('pointerdown', () => {
-    //   var worldPoint = this.input.activePointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
-    //   for (var i = 0; i < 4; i++) {
-    //     var x = worldPoint.x + Phaser.Math.RND.integerInRange(-5, 5);
-    //     var y = worldPoint.y + Phaser.Math.RND.integerInRange(-5, 5);
-    //     var frame = Phaser.Math.RND.integerInRange(0, 5);
-    //     this.matter.add.image(x, y, 'balls', frame, {restitution: 1});
-    //   }
-    // });
-
-
     // this.matter.enableCollisionEventsPlugin()
 
     if (!IS_PROD) {
@@ -221,7 +201,8 @@ export class City extends Phaser.Scene {
   drawCollisionShapes(graphics: Graphics) {
     graphics.clear();
     graphics.setScale(2)
-    graphics.lineStyle(0.5, 0xFFFF00FC);
+    graphics.lineStyle(0.5, 0xFFAA00);
+    graphics.fillStyle(0xFFAA00, 0.5)
 
     // Loop over each tile and visualize its collision shape (if it has one)
     this.mapLayerBuildings.forEachTile((tile: any) => {
@@ -246,7 +227,7 @@ export class City extends Phaser.Scene {
         // When objects are parsed by Phaser, they will be guaranteed to have one of the
         // following properties if they are a rectangle/ellipse/polygon/polyline.
         if (object.rectangle) {
-          graphics.strokeRect(objectX, objectY, object.width, object.height);
+          graphics.fillRect(objectX, objectY, object.width, object.height);
         } else if (object.ellipse) {
           // Ellipses in Tiled have a top-left origin, while ellipses in Phaser have a center
           // origin
@@ -271,9 +252,11 @@ export class City extends Phaser.Scene {
   }
 
   drawObjectShapes(graphics: Graphics) {
+
     graphics.clear();
     graphics.setScale(2)
-    graphics.lineStyle(1.5, 0x40FF9FBB);
+    graphics.lineStyle(1.5, 0xFF0000);
+    graphics.fillStyle(0xFF0000, 0.5)
 
     // Loop over each tile and visualize its collision shape (if it has one)
     this.mapLayerObjects.objects.forEach((object: any) => {
@@ -284,7 +267,7 @@ export class City extends Phaser.Scene {
       // When objects are parsed by Phaser, they will be guaranteed to have one of the
       // following properties if they are a rectangle/ellipse/polygon/polyline.
       if (object.rectangle) {
-        graphics.strokeRect(objectX, objectY, object.width, object.height);
+        graphics.fillRect(objectX, objectY, object.width, object.height);
       } else if (object.ellipse) {
         // Ellipses in Tiled have a top-left origin, while ellipses in Phaser have a center
         // origin
@@ -308,9 +291,45 @@ export class City extends Phaser.Scene {
   }
 
   debugAsdf(obj: GameObject) {
-    let gfx = this.add.graphics();
-    let body = obj.body as Phaser.Physics.Impact.Body;
+    // let gfx = this.add.graphics();
+    // let body = obj.body as Phaser.Physics.Impact.Body;
     // body.touches()
     // gfx.lineBetween(body.left, body.bottom, body.right, body.bottom);
+  }
+
+  private createMatterObjectsFromTiledObjectLayer() {
+    // let M = Phaser.Physics.Matter;
+    let matterCategory = this.matter.world.nextCategory()
+    this.mapLayerObjects.objects.forEach(object => {
+      let scale = 2;
+      let tiledObject = this.matter.add.rectangle(
+        object.x! * scale,
+        object.y! * scale,
+        object.width! * scale,
+        object.height! * scale,
+        {
+          scale: {x: 2, y: 2},
+
+          position: {x: object.x! * 2, y: object.y! * 2},
+          isSensor: true,
+          isStatic: true,
+          onCollideCallback: () => console.info("door collide"),
+          render: {
+            'sprite.xOffset': 32,
+            sprite: {
+              xOffset: 32,
+              yOffset: 32
+            }
+          }
+        })
+
+      tiledObject.centerOffset = {x: 50, y: 50}
+      tiledObject.scale = 3
+      tiledObject.centerOfMass = {x: 20, y: 20}
+      // let tiledObject = this.matter.bodies.rectangle(object.x, object.y, object.width, object.height)
+      // this.matter.setCollisionCategory(tiledObject, matterCategory)
+      // tiledObject.setCollidesWith([this.player]);
+    });
+    // this.player.setCollidesWith(matterCategory);
   }
 }
