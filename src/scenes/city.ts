@@ -10,14 +10,17 @@ import StaticTilemapLayer = Phaser.Tilemaps.StaticTilemapLayer;
 import Graphics = Phaser.GameObjects.Graphics;
 import GameObject = Phaser.GameObjects.GameObject;
 import ScaleModes = Phaser.Scale.ScaleModes;
+import ObjectLayer = Phaser.Tilemaps.ObjectLayer;
+import MatterBody = Phaser.Types.Physics.Matter.MatterBody;
 
 export class City extends Phaser.Scene {
 
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys | any;
   private player!: SpriteCharacter;
   private map: Tilemap = {} as Tilemap;
-  private mapLayer1: StaticTilemapLayer = {} as StaticTilemapLayer;
-  private mapLayer2: StaticTilemapLayer = {} as StaticTilemapLayer;
+  private mapLayerBackground: StaticTilemapLayer = {} as StaticTilemapLayer;
+  private mapLayerBuildings: StaticTilemapLayer = {} as StaticTilemapLayer;
+  private mapLayerObjects: ObjectLayer = {} as ObjectLayer;
   private gameStatus: GameStatus = new GameStatus(this)
 
   private buttonLeft!: PictureButton;
@@ -37,61 +40,85 @@ export class City extends Phaser.Scene {
 
     // HINT: use an extruded TileMap --> https://github.com/sporadic-labs/tile-extruder (Helps against pixel bleeding)
     let tileset: Tileset = IS_PROD ? this.map.addTilesetImage(TileImageSetKeys.CITY, TileImageSetKeys.CITY_EXTRUDED, 32, 32, 1, 2) : this.map.addTilesetImage(TileImageSetKeys.CITY);
+    this.mapLayerBackground = this.map.createStaticLayer(0, tileset, 0, 0).setScale(2);
+    this.mapLayerBuildings = this.map.createStaticLayer(1, tileset, 0, 0).setScale(2);
+    this.mapLayerObjects = this.map.getObjectLayer('BuildingEntries');
 
-    // A StaticTilemapLayer is super fast, but the tiles in that layer can’t be modified and can’t render per-tile effects like flipping or tint. A DynamicTilemapLayer trades some speed for the flexibility and power of manipulating individual tiles
-    this.mapLayer2 = this.map.createStaticLayer(1, tileset, 0, 0).setScale(2);
-    this.mapLayer1 = this.map.createStaticLayer(0, tileset, 0, 0).setScale(2);
+    console.info("####", this.map.getObjectLayerNames())
+    console.info("####", this.map.objects)
 
-    this.mapLayer1.setCollisionFromCollisionGroup(true)
-    this.mapLayer2.setCollisionFromCollisionGroup(true)
+    // HINT: Create sprite from TILED OBJECT
+    // CF. https://labs.phaser.io/edit.html?src=src%5Cgame%20objects%5Ctilemap%5Cstatic%5Ccreate%20from%20objects.js
+    //
+    // We convert all of the Tiled objects with an ID of 26 into sprites. They will get their width
+    // & height from the Tiled tile object. Any custom properties on the tile object will also be
+    // passed to the sprite creator (e.g. one of the tile object's has an alpha of 0.5).
+    // var coins = this.map.createFromObjects('BuildingEntries', 26, {key: 'entry'});
+    // console.info("Coins", coins)
+
+    this.mapLayerBuildings.setCollisionFromCollisionGroup(true)
+
+
+    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+    this.matter.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
     this.player = createSpriteCharacter(SpriteCharacters.IngaChild, this).setPosition(250, 660)
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
-    this.cameras.main.startFollow(this.player, true);
+    this.cameras.main.startFollow(this.player, false);
 
-    // this.physics.add.existing(this.player)
-    // this.physics.add.collider(this.player, this.mapLayer1)
-
+    this.createMatterObjectsFromTiledObjectLayer()
 
     // Get the layers registered with Matter. Any colliding tiles will be given a Matter body. We
     // haven't mapped our collision shapes in Tiled so each colliding tile will get a default
     // rectangle body (similar to AP).
-    this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
-    this.matter.world.convertTilemapLayer(this.mapLayer1);
-    // this.map.setCollisionBetween(1, 1000, true, true, this.mapLayer2)
+    this.matter.world.convertTilemapLayer(this.mapLayerBuildings);
+    // this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
+    // this.matter.add.worldConstraint(this.player);
 
     this.matter.world.on('collisionstart', (event: any, bodyA: any, bodyB: any) => {
       console.log('collision', event, bodyA, bodyB);
     });
-    this.player.setOnCollide(() => console.info("Player collides"))
-    this.player.setOnCollideActive(() => console.info("Collide activ"))
-    // this.matter.add.gameObject(this.player, {})
-    // this.physics.add.collider(this.player, this.mapLayer1);
 
-    // Drop bouncy, Matter balls on pointer down
-    // this.input.on('pointerdown', () => {
-    //   var worldPoint = this.input.activePointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
-    //   for (var i = 0; i < 4; i++) {
-    //     var x = worldPoint.x + Phaser.Math.RND.integerInRange(-5, 5);
-    //     var y = worldPoint.y + Phaser.Math.RND.integerInRange(-5, 5);
-    //     var frame = Phaser.Math.RND.integerInRange(0, 5);
-    //     this.matter.add.image(x, y, 'balls', frame, {restitution: 1});
-    //   }
+    // let M = Phaser.Physics.Matter;
+
+    // FIXME use smoothedcontorls
+    // smoothedControls = new SmoothedHorionztalControl(0.0005);
+
+    // Use matter events to detect whether the player is touching a surface to the left, right or
+    // bottom.
+
+    // Before matter's update, reset the player's count of what surfaces it is touching.
+    this.matter.world.on('beforeupdate', function (event: any) {
+      // playerController.numTouching.left = 0;
+      // playerController.numTouching.right = 0;
+      // playerController.numTouching.bottom = 0;
+    });
+
+    this.matter.world.on('collisionactive', function (event: any) {
+      console.info("collisionactive", event.pairs, event)
+    });
+
+    // Update over, so now we can determine if any direction is blocked
+    // this.matter.world.on('afterupdate', function (event: any) {
+    //   console.info("afterupdate", event)
     // });
 
-
+    // this.player.setOnCollideWith(this.mapLayerBuildings.body, () => console.info("setOnCollideWith"))
+    // this.matter.add.gameObject(this.player, {})
     // this.matter.enableCollisionEventsPlugin()
 
     if (!IS_PROD) {
       let shapeGraphics = this.add.graphics();
       this.drawCollisionShapes(shapeGraphics);
 
+      let shapeGraphics2 = this.add.graphics();
+      this.drawObjectShapes(shapeGraphics2);
+
       var debugGraphics = this.add.graphics();
       debugGraphics.setScale(2);
-      this.mapLayer1.renderDebug(debugGraphics, {
+      this.mapLayerBuildings.renderDebug(debugGraphics, {
         tileColor: null, //new Phaser.Display.Color(105, 210, 231, 200), // Non colliding tiles
         collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200), // Colliding tiles
         faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Interesting faces, i.e. colliding edges
@@ -132,8 +159,8 @@ export class City extends Phaser.Scene {
 
   // FIXME: diagnoal movement needs to be slower
   update(time: number, delta: number) {
-    // if (this.physics.collide(this.player, this.mapLayer1)) {
-    //   console.info(this.physics.collide(this.player, this.mapLayer1));
+    // if (this.physics.collide(this.player, this.mapLayerBackground)) {
+    //   console.info(this.physics.collide(this.player, this.mapLayerBackground));
     // }
     // this.player.update(arguments)
 
@@ -152,7 +179,7 @@ export class City extends Phaser.Scene {
       this.player.alignToFacing();
     } else {
       if (this.player.isMoving) {
-        // console.info("can player collide?", this.matter.detector.canCollide(this.player, this.map), this.matter.detector.canCollide(this.player, this.mapLayer1), this.matter.detector.canCollide(this.player, this.mapLayer2))
+        // console.info("can player collide?", this.matter.detector.canCollide(this.player, this.map), this.matter.detector.canCollide(this.player, this.mapLayerBackground), this.matter.detector.canCollide(this.player, this.mapLayerBuildings))
       }
 
       if (this.cursors.left.isDown || this.buttonLeft.isPressed) {
@@ -174,10 +201,11 @@ export class City extends Phaser.Scene {
   drawCollisionShapes(graphics: Graphics) {
     graphics.clear();
     graphics.setScale(2)
-    graphics.lineStyle(0.5, 0xFFFF00FC);
+    graphics.lineStyle(0.5, 0xFFAA00);
+    graphics.fillStyle(0xFFAA00, 0.5)
 
     // Loop over each tile and visualize its collision shape (if it has one)
-    this.mapLayer1.forEachTile((tile: any) => {
+    this.mapLayerBuildings.forEachTile((tile: any) => {
       var tileWorldX = tile.getLeft();
       var tileWorldY = tile.getTop();
       var collisionGroup = tile.getCollisionGroup();
@@ -199,7 +227,7 @@ export class City extends Phaser.Scene {
         // When objects are parsed by Phaser, they will be guaranteed to have one of the
         // following properties if they are a rectangle/ellipse/polygon/polyline.
         if (object.rectangle) {
-          graphics.strokeRect(objectX, objectY, object.width, object.height);
+          graphics.fillRect(objectX, objectY, object.width, object.height);
         } else if (object.ellipse) {
           // Ellipses in Tiled have a top-left origin, while ellipses in Phaser have a center
           // origin
@@ -223,10 +251,85 @@ export class City extends Phaser.Scene {
     });
   }
 
+  drawObjectShapes(graphics: Graphics) {
+
+    graphics.clear();
+    graphics.setScale(2)
+    graphics.lineStyle(1.5, 0xFF0000);
+    graphics.fillStyle(0xFF0000, 0.5)
+
+    // Loop over each tile and visualize its collision shape (if it has one)
+    this.mapLayerObjects.objects.forEach((object: any) => {
+
+      var objectX = object.x;
+      var objectY = object.y;
+
+      // When objects are parsed by Phaser, they will be guaranteed to have one of the
+      // following properties if they are a rectangle/ellipse/polygon/polyline.
+      if (object.rectangle) {
+        graphics.fillRect(objectX, objectY, object.width, object.height);
+      } else if (object.ellipse) {
+        // Ellipses in Tiled have a top-left origin, while ellipses in Phaser have a center
+        // origin
+        graphics.strokeEllipse(
+          objectX + object.width / 2, objectY + object.height / 2,
+          object.width, object.height
+        );
+      } else if (object.polygon || object.polyline) {
+        var originalPoints = object.polygon ? object.polygon : object.polyline;
+        var points = [];
+        for (var j = 0; j < originalPoints.length; j++) {
+          var point = originalPoints[j];
+          points.push({
+            x: (objectX + point.x),
+            y: (objectY + point.y)
+          });
+        }
+        graphics.strokePoints(points);
+      }
+    })
+  }
+
   debugAsdf(obj: GameObject) {
-    let gfx = this.add.graphics();
-    let body = obj.body as Phaser.Physics.Impact.Body;
+    // let gfx = this.add.graphics();
+    // let body = obj.body as Phaser.Physics.Impact.Body;
     // body.touches()
     // gfx.lineBetween(body.left, body.bottom, body.right, body.bottom);
+  }
+
+  private createMatterObjectsFromTiledObjectLayer() {
+    // let M = Phaser.Physics.Matter;
+    let matterCategory = this.matter.world.nextCategory()
+    this.mapLayerObjects.objects.forEach(object => {
+      let scale = 2;
+      let tiledObject = this.matter.add.rectangle(
+        object.x! * scale,
+        object.y! * scale,
+        object.width! * scale,
+        object.height! * scale,
+        {
+          scale: {x: 2, y: 2},
+
+          position: {x: object.x! * 2, y: object.y! * 2},
+          isSensor: true,
+          isStatic: true,
+          onCollideCallback: () => console.info("door collide"),
+          render: {
+            'sprite.xOffset': 32,
+            sprite: {
+              xOffset: 32,
+              yOffset: 32
+            }
+          }
+        })
+
+      tiledObject.centerOffset = {x: 50, y: 50}
+      tiledObject.scale = 3
+      tiledObject.centerOfMass = {x: 20, y: 20}
+      // let tiledObject = this.matter.bodies.rectangle(object.x, object.y, object.width, object.height)
+      // this.matter.setCollisionCategory(tiledObject, matterCategory)
+      // tiledObject.setCollidesWith([this.player]);
+    });
+    // this.player.setCollidesWith(matterCategory);
   }
 }
