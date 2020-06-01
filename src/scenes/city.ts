@@ -37,16 +37,20 @@ export class City extends Phaser.Scene {
 
     // HINT: use an extruded TileMap --> https://github.com/sporadic-labs/tile-extruder (Helps against pixel bleeding)
     let tileset: Tileset = IS_PROD ? this.map.addTilesetImage(TileImageSetKeys.CITY, TileImageSetKeys.CITY_EXTRUDED, 32, 32, 1, 2) : this.map.addTilesetImage(TileImageSetKeys.CITY);
+
+    // A StaticTilemapLayer is super fast, but the tiles in that layer can’t be modified and can’t render per-tile effects like flipping or tint. A DynamicTilemapLayer trades some speed for the flexibility and power of manipulating individual tiles
     this.mapLayer2 = this.map.createStaticLayer(1, tileset, 0, 0).setScale(2);
     this.mapLayer1 = this.map.createStaticLayer(0, tileset, 0, 0).setScale(2);
 
     this.mapLayer1.setCollisionFromCollisionGroup(true)
+    this.mapLayer2.setCollisionFromCollisionGroup(true)
 
     this.player = createSpriteCharacter(SpriteCharacters.IngaChild, this).setPosition(250, 660)
+
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
-    this.cameras.main.startFollow(this.player, false);
+    this.cameras.main.startFollow(this.player, true);
 
     // this.physics.add.existing(this.player)
     // this.physics.add.collider(this.player, this.mapLayer1)
@@ -55,14 +59,15 @@ export class City extends Phaser.Scene {
     // Get the layers registered with Matter. Any colliding tiles will be given a Matter body. We
     // haven't mapped our collision shapes in Tiled so each colliding tile will get a default
     // rectangle body (similar to AP).
-    this.matter.world.convertTilemapLayer(this.mapLayer1);
     this.matter.world.setBounds(this.map.widthInPixels, this.map.heightInPixels);
+    this.matter.world.convertTilemapLayer(this.mapLayer1);
+    // this.map.setCollisionBetween(1, 1000, true, true, this.mapLayer2)
 
     this.matter.world.on('collisionstart', (event: any, bodyA: any, bodyB: any) => {
       console.log('collision', event, bodyA, bodyB);
     });
-
-    // this.player.setOnCollideWith(this.mapLayer1)
+    this.player.setOnCollide(() => console.info("Player collides"))
+    this.player.setOnCollideActive(() => console.info("Collide activ"))
     // this.matter.add.gameObject(this.player, {})
     // this.physics.add.collider(this.player, this.mapLayer1);
 
@@ -83,7 +88,6 @@ export class City extends Phaser.Scene {
     if (!IS_PROD) {
       let shapeGraphics = this.add.graphics();
       this.drawCollisionShapes(shapeGraphics);
-
 
       var debugGraphics = this.add.graphics();
       debugGraphics.setScale(2);
