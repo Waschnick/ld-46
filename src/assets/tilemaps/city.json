@@ -274,8 +274,17 @@
          "tilewidth":32
         }, 
         {
+         "columns":27,
          "firstgid":1601,
-         "source":"haus+wind.tsx"
+         "image":"haus+wind.png",
+         "imageheight":860,
+         "imagewidth":895,
+         "margin":0,
+         "name":"haus+wind",
+         "spacing":0,
+         "tilecount":702,
+         "tileheight":32,
+         "tilewidth":32
         }],
  "tilewidth":32,
  "type":"map",
